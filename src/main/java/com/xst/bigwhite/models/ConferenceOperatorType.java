@@ -7,8 +7,10 @@ package com.xst.bigwhite.models;
  */
 public enum ConferenceOperatorType {
 	 CONNECT,
+	 RECONNECT,
 	 DISCONNECT,
 	 CREATESESSION,
+	 REOPENSESSION,
 	 JOINSESSION,
-     ABORT,
+     ABORTSESSION,
 }

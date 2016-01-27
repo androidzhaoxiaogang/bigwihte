@@ -23,6 +23,8 @@ import com.xst.bigwhite.dtos.RegisterConferenceResponse;
 import com.xst.bigwhite.exception.RestRuntimeException;
 import com.xst.bigwhite.models.Account;
 import com.xst.bigwhite.models.Conference;
+import com.xst.bigwhite.models.ConferenceOperatorType;
+import com.xst.bigwhite.models.ConferenceRecord;
 import com.xst.bigwhite.utils.SMSManager;
 import com.xst.bigwhite.utils.UUIDGenerator;
 
@@ -85,6 +87,9 @@ public class ConferenceController {
 						conference.setActiveTime(new Date());
 						conferenceRepository.save(conference);
 						
+						ConferenceRecord conferenceRecord = new ConferenceRecord(conference,account,ConferenceOperatorType.REOPENSESSION);
+						conferenceRecordRepository.save(conferenceRecord);
+						
 						response.setSessionId(conference.getSessionId());
 						response.setSessionname(conference.getSessionname());
 					}
@@ -95,6 +100,9 @@ public class ConferenceController {
 				sessionId =  UUIDGenerator.getUUID();
 				Conference conference = new Conference(sessionId,sessionName,account);
 				Conference regConference = conferenceRepository.save(conference);
+				
+				ConferenceRecord conferenceRecord = new ConferenceRecord(conference,account,ConferenceOperatorType.CREATESESSION);
+				conferenceRecordRepository.save(conferenceRecord);
 				
 				response.setSessionId(sessionId);
 				response.setSessionname(sessionName);

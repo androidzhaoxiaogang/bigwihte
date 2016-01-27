@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -57,7 +59,8 @@ public class ConferenceRecord implements Serializable {
 	/**
 	 * 操作类型
 	 */
-	public ConferenceOperatorType endReason = ConferenceOperatorType.CONNECT;
+	@Enumerated(EnumType.STRING)
+	public ConferenceOperatorType operatorType = ConferenceOperatorType.CONNECT;
 
 	public Long getId() {
 		return id;
@@ -99,13 +102,22 @@ public class ConferenceRecord implements Serializable {
 		this.endDate = endDate;
 	}
 
-	public ConferenceOperatorType getEndReason() {
-		return endReason;
+	
+	public ConferenceOperatorType getOperatorType() {
+		return operatorType;
 	}
 
-	public void setEndReason(ConferenceOperatorType endReason) {
-		this.endReason = endReason;
+	public void setOperatorType(ConferenceOperatorType operatorType) {
+		this.operatorType = operatorType;
+	}
+
+	ConferenceRecord(){
+		//JPA
 	}
 	
-	
+	public ConferenceRecord(Conference conference,Account account,ConferenceOperatorType operatorType){
+		this.conference = conference;
+		this.account = account;
+	    this.operatorType = operatorType;
+	}
 }
