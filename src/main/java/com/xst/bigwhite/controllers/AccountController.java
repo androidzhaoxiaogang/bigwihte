@@ -141,7 +141,7 @@ public class AccountController {
 			}
 			
 		} else {
-			throw new RestRuntimeException("账户不存在!");
+			throw new RestRuntimeException("账户" + input.mobileno + "不存在!");
 		}
 
 		return true;

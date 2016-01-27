@@ -45,6 +45,12 @@ public class Conference implements Serializable {
 	public String sessionId;
 	
 	/**
+	 * 会议名称
+	 */
+	@NotBlank(message="会议名称不能为空")
+	public String sessionname;
+	
+	/**
 	 * 创建日期
 	 */
 	public Date createDate = new Date();
@@ -112,6 +118,16 @@ public class Conference implements Serializable {
 	}
 
 
+	public String getSessionname() {
+		return sessionname;
+	}
+
+
+	public void setSessionname(String sessionname) {
+		this.sessionname = sessionname;
+	}
+
+
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -161,7 +177,16 @@ public class Conference implements Serializable {
 		this.accounts = accounts;
 	}
 
-
+    public Conference(String sessionId,String sessionName){
+    	this.sessionId = sessionId;
+    	this.sessionname = sessionName;
+    }
+	
+    public Conference(String sessionId,String sessionName,Account createBy){
+    	this(sessionId,sessionName);
+    	this.createBy = createBy;
+    }
+    
 	Conference() { // jpa only
 	}
 }

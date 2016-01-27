@@ -1,5 +1,10 @@
 package com.xst.bigwhite.dtos;
 
-public class RegisterConferenceResponse {
-
+/**
+ * 会议注册返回信息类
+ * @author wangjun
+ *
+ */
+public class RegisterConferenceResponse extends RegisterConferenceRequest {
+    
 }

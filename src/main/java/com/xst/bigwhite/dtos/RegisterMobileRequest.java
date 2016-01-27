@@ -1,5 +1,7 @@
 package com.xst.bigwhite.dtos;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 /**
  * 移动设备 手机 平板注册信息类
  * @author wangjun
@@ -10,6 +12,7 @@ public class RegisterMobileRequest {
 	 * 手机号 
 	 * 备注 : 当用户用app客户端注册时 填写手机号注册
 	 */
+	@NotBlank
 	public String mobileno;
 	
 
