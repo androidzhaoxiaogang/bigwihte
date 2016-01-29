@@ -218,6 +218,7 @@ public class AccountController {
 		if (!accountd.isPresent()) {
 			Account accountNew = new Account(input.mobileno, input.mobileno);
 			accountNew.setCreatedate(new Date());
+			accountNew.setPassword("bigmax!@#");
 			accountRepository.save(accountNew);
 
 			Optional<VerifyMessage> message = verifyMessageRepository.findTop1ByMobileno(input.mobileno);
