@@ -11,5 +11,5 @@ import com.xst.bigwhite.models.Conference;
 @SuppressWarnings("rawtypes")
 @Repository
 public interface ConferenceRepository  extends JpaRepository<Conference, Long>{
-	Optional<Conference> findBySessionId(String sessionId);
+	Optional<Conference> findTop1BySessionId(String sessionId);
 }

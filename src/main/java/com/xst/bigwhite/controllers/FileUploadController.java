@@ -103,7 +103,7 @@ public class FileUploadController {
                  Picture picture = new Picture(uploadFolder + filename, destinationDir + filename);
                  pictureRepository.save(picture);
                  
-                 Optional<Account> accouted = accountRepository.findByMobileno(mobileno);
+                 Optional<Account> accouted = accountRepository.findTop1ByMobileno(mobileno);
                  if(accouted.isPresent()){
                 	 Account account = accouted.get();
                 	 account.headimage = uploadFolder + thumbnail;
@@ -162,7 +162,7 @@ public class FileUploadController {
                  Picture picture = new Picture(uploadFolder + filename, destinationDir + filename);
                  pictureRepository.save(picture);
                  
-                 Optional<Device> deviced = deviceRepository.findByno(deviceno);
+                 Optional<Device> deviced = deviceRepository.findTop1Byno(deviceno);
                  if(deviced.isPresent()){
                 	 Device device = deviced.get();
                 	 device.headimage = uploadFolder + thumbnail;

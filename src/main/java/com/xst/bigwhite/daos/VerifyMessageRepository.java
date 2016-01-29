@@ -10,6 +10,6 @@ import com.xst.bigwhite.models.VerifyMessage;
 
 @Repository
 public interface VerifyMessageRepository  extends JpaRepository<VerifyMessage, Long> {
-	Optional<VerifyMessage> findByMobileno(String mobileno);
-	Optional<VerifyMessage> findByMobilenoAndVerifycode(String mobileno,String verifycode);
+	Optional<VerifyMessage> findTop1ByMobileno(String mobileno);
+	Optional<VerifyMessage> findTop1ByMobilenoAndVerifycode(String mobileno,String verifycode);
 }

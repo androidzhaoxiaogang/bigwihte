@@ -9,5 +9,5 @@ import com.xst.bigwhite.models.Picture;
 
 @Repository
 public interface PictureRepository extends JpaRepository<Picture, Long>{
-	Optional<Picture> findByImageurl(String imageurl);
+	Optional<Picture> findTop1ByImageurl(String imageurl);
 }

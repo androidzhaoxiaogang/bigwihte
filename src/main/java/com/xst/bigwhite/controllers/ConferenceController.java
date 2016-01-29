@@ -73,11 +73,11 @@ public class ConferenceController {
 		
 		response.setMobileno(mobileno);
 		
-		Optional<Account> accounted = accountRepository.findByMobileno(mobileno);
+		Optional<Account> accounted = accountRepository.findTop1ByMobileno(mobileno);
 		if(accounted.isPresent()){
 			Account account = accounted.get();
 			if(sessionId!=null && sessionId.trim().length()>0){  //会议已经存在
-				Optional<Conference> conferenced = conferenceRepository.findBySessionId(sessionId);
+				Optional<Conference> conferenced = conferenceRepository.findTop1BySessionId(sessionId);
 				if(conferenced.isPresent()){
 					Conference conference = conferenced.get();
 					if(!conference.getCreateBy().mobileno.equals(mobileno)){

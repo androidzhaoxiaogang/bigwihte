@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    Optional<Account> findByUsernameOrMobileno(String username,String mobileno);
-    Optional<Account> findByUsernameOrPassword(String mobileno,String password);
-    Optional<Account> findByMobileno(String mobileno);
+    Optional<Account> findTop1ByUsernameOrMobileno(String username,String mobileno);
+    Optional<Account> findTop1ByMobilenoOrPassword(String mobileno,String password);
+    Optional<Account> findTop1ByMobileno(String mobileno);
 }

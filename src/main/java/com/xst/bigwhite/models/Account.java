@@ -3,6 +3,7 @@ package com.xst.bigwhite.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.util.ArrayBuilders.BooleanBuilder;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -83,6 +84,7 @@ public class Account implements Serializable  {
 	 */
 	@NotBlank(message="手机号不能为空")  
 	@Size(min=11, max=20)
+	@Column(name = "mobileno", unique = true, nullable = false, length = 32)
 	public String mobileno;
 
 	/**

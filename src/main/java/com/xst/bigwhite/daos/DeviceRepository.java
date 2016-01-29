@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface  DeviceRepository  extends JpaRepository<Device, Long> {
     Collection<Device> findByAccountUsername(String username);
-    Optional<Device> findBySn(String sn);
-    Optional<Device> findByno(String no);
+    Optional<Device> findTop1BySn(String sn);
+    Optional<Device> findTop1Byno(String no);
 }

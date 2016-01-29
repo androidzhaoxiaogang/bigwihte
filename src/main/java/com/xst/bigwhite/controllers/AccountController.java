@@ -89,7 +89,7 @@ public class AccountController {
 			throw new RestRuntimeException("密码不能为空,请先修改密码!");
 		}
 		
-		Optional<Account> accounted = accountRepository.findByMobileno(input.mobileno);
+		Optional<Account> accounted = accountRepository.findTop1ByMobileno(input.mobileno);
 		if (accounted.isPresent()) {
 			Account account = accounted.get();
 
@@ -111,7 +111,7 @@ public class AccountController {
 	@ResponseBody
 	Boolean updateUserName(@RequestBody AccountInfoRequest input) {
 		
-		Optional<Account> accounted = accountRepository.findByMobileno(input.mobileno);
+		Optional<Account> accounted = accountRepository.findTop1ByMobileno(input.mobileno);
 		if (accounted.isPresent()) {
 			Account account = accounted.get();
 			if(!account.username.equals(input.username))
@@ -167,7 +167,7 @@ public class AccountController {
 			throw new RestRuntimeException("密码不能为空,请先修改密码!");
 		}
 		
-		Optional<Account> accounted = accountRepository.findByUsernameOrPassword(mobileno, password);
+		Optional<Account> accounted = accountRepository.findTop1ByMobilenoOrPassword(mobileno, password);
 
 		if (accounted.isPresent()) {
 			Account account = accounted.get();
@@ -213,14 +213,14 @@ public class AccountController {
 		// Set<ConstraintViolation<Account>> failures =
 		// validator.validate(input);
 		RegisterMobileResponse response = new RegisterMobileResponse();
-		Optional<Account> accountd = accountRepository.findByMobileno(input.mobileno);
+		Optional<Account> accountd = accountRepository.findTop1ByMobileno(input.mobileno);
 		String verifycode = Helpers.random(6);
 		if (!accountd.isPresent()) {
 			Account accountNew = new Account(input.mobileno, input.mobileno);
 			accountNew.setCreatedate(new Date());
 			accountRepository.save(accountNew);
 
-			Optional<VerifyMessage> message = verifyMessageRepository.findByMobileno(input.mobileno);
+			Optional<VerifyMessage> message = verifyMessageRepository.findTop1ByMobileno(input.mobileno);
 			if (message.isPresent()) {
 				VerifyMessage verifyMessage = message.get();
 				Calendar rightNow = Calendar.getInstance();
@@ -263,7 +263,7 @@ public class AccountController {
 
 		String mobileno = input.mobileno;
 		String verifycode = input.verifycode;
-		Optional<VerifyMessage> verify = verifyMessageRepository.findByMobilenoAndVerifycode(mobileno, verifycode);
+		Optional<VerifyMessage> verify = verifyMessageRepository.findTop1ByMobilenoAndVerifycode(mobileno, verifycode);
 
 		VerifyMessage verifyMessage;
 		if(verify.isPresent()){
@@ -298,7 +298,7 @@ public class AccountController {
 		if(username==null || username.length()<=0)
 			throw new RestRuntimeException("用户名不能为空!");
 		
-		Optional<Account> accounted = accountRepository.findByMobileno(mobileno);
+		Optional<Account> accounted = accountRepository.findTop1ByMobileno(mobileno);
 		if (accounted.isPresent()) {
 			Boolean deviceadmin = false;
 
@@ -311,7 +311,7 @@ public class AccountController {
 			
 			Account accountUpdated = accountRepository.save(account);
 
-			Optional<Device> deviced = deviceRepository.findByno(input.getDeviceno());
+			Optional<Device> deviced = deviceRepository.findTop1Byno(input.getDeviceno());
 			if (deviced.isPresent()) {
 				AccountDevice accountDevice = null;
 				Iterable<AccountDevice> accountDevices = getAccountDevice(mobileno,deviceno);
@@ -362,7 +362,7 @@ public class AccountController {
 		String mobileno = input.mobileno;
 		String deviceno = input.deviceno;
 		
-		Optional<Account> accounted = accountRepository.findByMobileno(mobileno);
+		Optional<Account> accounted = accountRepository.findTop1ByMobileno(mobileno);
 		if (accounted.isPresent()) {
 			Account account = accounted.get();
 			Set<AccountDevice> devices = account.getDevices();

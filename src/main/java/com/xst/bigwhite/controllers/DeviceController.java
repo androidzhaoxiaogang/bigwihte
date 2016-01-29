@@ -65,7 +65,7 @@ public class DeviceController {
     @RequestMapping(value = "/registry",method = RequestMethod.POST)
     @ResponseBody RegisterDeviceResponse registryDevice(@RequestBody RegisterDeviceRequest input) {
     	RegisterDeviceResponse response = new RegisterDeviceResponse();
-    	Optional<Device> device = deviceRepository.findBySn(input.sn);
+    	Optional<Device> device = deviceRepository.findTop1BySn(input.sn);
     	
         if(device.isPresent()){
         	response.deviceno = device.get().no;
@@ -96,7 +96,7 @@ public class DeviceController {
 	 @RequestMapping(value = "/scanQR",method = RequestMethod.POST)
 	    @ResponseBody ScanDeviceResponse scanDeviceQR(@RequestBody ScanDeviceRequest input) {
 	    	ScanDeviceResponse response = new ScanDeviceResponse();
-	    	Optional<Device> deviced = deviceRepository.findByno(input.getDeviceno());
+	    	Optional<Device> deviced = deviceRepository.findTop1Byno(input.getDeviceno());
 	    	if(deviced.isPresent()){
 	    		Device device = deviced.get();
 
@@ -120,7 +120,7 @@ public class DeviceController {
 		DeviceInfoResponse response = new DeviceInfoResponse();
 
 		String deviceno = input.getDeviceno();
-		Optional<Device> deviced = deviceRepository.findByno(deviceno);
+		Optional<Device> deviced = deviceRepository.findTop1Byno(deviceno);
 		if (deviced.isPresent()) {
 			Device device = deviced.get();
 			response.setDevicename(device.getName());
