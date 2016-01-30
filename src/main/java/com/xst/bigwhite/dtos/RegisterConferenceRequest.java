@@ -10,16 +10,21 @@ import org.hibernate.validator.constraints.NotBlank;
 public class RegisterConferenceRequest {
 	
 	/**
-	 * 手机号 
-	 * 备注 : 当用户用app客户端注册时 填写手机号注册
+	 * 设备号
+	 * 备注 : 大白号
 	 */
 	@NotBlank
-	public String mobileno;
+	public String deviceno;
 	
 	/**
 	 * 会议回话ID
 	 */
     public String sessionId;
+    
+    /**
+     * 会议UI
+     */
+    public String ui;
     
     /**
 	 * 会议名称
@@ -28,13 +33,13 @@ public class RegisterConferenceRequest {
 	public String sessionname;
 	
 	
-  	public String getMobileno() {
-  		return mobileno;
-  	}
+	public String getDeviceno() {
+		return deviceno;
+	}
 
-  	public void setMobileno(String mobileno) {
-  		this.mobileno = mobileno;
-  	}
+	public void setDeviceno(String deviceno) {
+		this.deviceno = deviceno;
+	}
 
 	public String getSessionId() {
 		return sessionId;
@@ -42,6 +47,15 @@ public class RegisterConferenceRequest {
 
 	public void setSessionId(String sessionId) {
 		this.sessionId = sessionId;
+	}
+	
+
+	public String getUi() {
+		return ui;
+	}
+
+	public void setUi(String ui) {
+		this.ui = ui;
 	}
 
 	public String getSessionname() {

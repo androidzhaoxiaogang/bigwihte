@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * 用户会议关联表
+ * 账号会议关联表
  * @author wangjun
  *
  */
@@ -31,7 +31,7 @@ public class ConferenceAccount implements Serializable {
 	private Long id;
 
 	/**
-	 * 帐号信息
+	 * 参与会议的帐号信息
 	 */
 	@JsonIgnore
 	@ManyToOne
@@ -44,12 +44,10 @@ public class ConferenceAccount implements Serializable {
 	@ManyToOne
 	private Conference conference;
 	
-	
 	/**
-	 * 是否会议发起人
+	 * 会议总分钟数
 	 */
-	public Boolean ownered = new Boolean(false);
-
+	public int minutes;
 
 	public Long getId() {
 		return id;
@@ -58,16 +56,6 @@ public class ConferenceAccount implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-
-	public Account getAccount() {
-		return account;
-	}
-
-
-	public void setAccount(Account account) {
-		this.account = account;
 	}
 
 
@@ -81,14 +69,15 @@ public class ConferenceAccount implements Serializable {
 	}
 
 
-	public Boolean getOwnered() {
-		return ownered;
+	public Account getAccount() {
+		return account;
 	}
 
 
-	public void setOwnered(Boolean ownered) {
-		this.ownered = ownered;
+	public void setAccount(Account account) {
+		this.account = account;
 	}
-	
+
+
 
 }

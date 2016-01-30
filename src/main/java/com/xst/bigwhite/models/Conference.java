@@ -44,6 +44,9 @@ public class Conference implements Serializable {
 	@NotBlank(message="会议编号不能为空")
 	public String sessionId;
 	
+	@NotBlank(message="会议UI不能为空")
+	public String ui;
+	
 	/**
 	 * 会议名称
 	 */
@@ -68,14 +71,6 @@ public class Conference implements Serializable {
 	public Date endDate = new Date();
 	
 	/**
-	 * 登入的帐号
-	 */
-	@JsonIgnore
-	@ManyToOne
-	private Account createBy;
-		
-	
-	/**
 	 * 参与 会议 的用户
 	 *
 	 */
@@ -87,6 +82,13 @@ public class Conference implements Serializable {
 	 * 单位:分钟
 	 */
 	public Integer totalMinutes = new Integer(0);
+	
+	/**
+	 * 设备信息
+	 */
+	@JsonIgnore
+	@ManyToOne
+	private Device device;
 	
 	
 	public Integer getTotalMinutes() {
@@ -115,6 +117,16 @@ public class Conference implements Serializable {
 
 	public void setSessionId(String sessionId) {
 		this.sessionId = sessionId;
+	}
+
+
+	public String getUi() {
+		return ui;
+	}
+
+
+	public void setUi(String ui) {
+		this.ui = ui;
 	}
 
 
@@ -157,17 +169,6 @@ public class Conference implements Serializable {
 		this.endDate = endDate;
 	}
 
-
-	public Account getCreateBy() {
-		return createBy;
-	}
-
-
-	public void setCreateBy(Account createBy) {
-		this.createBy = createBy;
-	}
-
-
 	public Set<ConferenceAccount> getAccounts() {
 		return accounts;
 	}
@@ -177,16 +178,27 @@ public class Conference implements Serializable {
 		this.accounts = accounts;
 	}
 
-    public Conference(String sessionId,String sessionName){
+
+	public Device getDevice() {
+		return device;
+	}
+
+
+	public void setDevice(Device device) {
+		this.device = device;
+	}
+
+	public Conference(String sessionId,String sessionName,Device device){
+    	this.sessionId = sessionId;
+    	this.sessionname = sessionName;
+    	this.device = device;
+    }
+	
+	public Conference(String sessionId,String sessionName){
     	this.sessionId = sessionId;
     	this.sessionname = sessionName;
     }
 	
-    public Conference(String sessionId,String sessionName,Account createBy){
-    	this(sessionId,sessionName);
-    	this.createBy = createBy;
-    }
-    
 	Conference() { // jpa only
 	}
 }

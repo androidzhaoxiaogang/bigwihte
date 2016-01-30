@@ -37,13 +37,7 @@ public class Account implements Serializable  {
 	@OneToMany(mappedBy = "account")
     private Set<AccountDevice> devices = new HashSet<>();
 
-	/**
-	 * 用户参与的会议 
-	 *
-	 */
-	@OneToMany(mappedBy = "account")
-    private Set<ConferenceAccount> conferences = new HashSet<>();
-	
+
 	/**
 	 * 用户的登入历史信息
 	 */
@@ -55,9 +49,9 @@ public class Account implements Serializable  {
 	/**
 	 * 创建的会议
 	 */
-	@OneToMany(mappedBy = "createBy")
+	@OneToMany(mappedBy = "account")
 	@JsonIgnore
-    private Set<Conference> ownerConferences = new HashSet<>();
+    private Set<ConferenceAccount> conferences = new HashSet<>();
 	
 	/**
 	 * JPA 主键
@@ -107,16 +101,7 @@ public class Account implements Serializable  {
 	 * 最后更新时间
 	 */
 	public Date lastlogindate = new Date();
-	
-	
-	public Set<Conference> getOwnerConferences() {
-		return ownerConferences;
-	}
 
-	public void setOwnerConferences(Set<Conference> ownerConferences) {
-		this.ownerConferences = ownerConferences;
-	}
-	
 
 	public Set<ConferenceAccount> getConferences() {
 		return conferences;

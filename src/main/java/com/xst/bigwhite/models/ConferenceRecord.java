@@ -40,11 +40,11 @@ public class ConferenceRecord implements Serializable {
 	private Conference conference;
 	
 	/**
-	 * 帐号信息
+	 * 设备信息
 	 */
 	@JsonIgnore
 	@ManyToOne
-	private Account account;
+	private Device device;
 	
 	/**
 	 * 开始时间
@@ -60,7 +60,7 @@ public class ConferenceRecord implements Serializable {
 	 * 操作类型
 	 */
 	@Enumerated(EnumType.STRING)
-	public ConferenceOperatorType operatorType = ConferenceOperatorType.CONNECT;
+	public ConferenceOperatorType operatorType = ConferenceOperatorType.CREATE;
 
 	public Long getId() {
 		return id;
@@ -78,12 +78,14 @@ public class ConferenceRecord implements Serializable {
 		this.conference = conference;
 	}
 
-	public Account getAccount() {
-		return account;
+	
+
+	public Device getDevice() {
+		return device;
 	}
 
-	public void setAccount(Account account) {
-		this.account = account;
+	public void setDevice(Device device) {
+		this.device = device;
 	}
 
 	public Date getBeginDate() {
@@ -115,9 +117,9 @@ public class ConferenceRecord implements Serializable {
 		//JPA
 	}
 	
-	public ConferenceRecord(Conference conference,Account account,ConferenceOperatorType operatorType){
+	public ConferenceRecord(Conference conference,Device device,ConferenceOperatorType operatorType){
 		this.conference = conference;
-		this.account = account;
+		this.device = device;
 	    this.operatorType = operatorType;
 	}
 }

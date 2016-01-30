@@ -8,7 +8,7 @@ import com.xst.bigwhite.models.ConferenceAccount;
 
 @SuppressWarnings("rawtypes")
 @Repository
-public interface ConferenceAccountRepository  extends JpaRepository<ConferenceAccount, Long>, 
-													  QueryDslPredicateExecutor<ConferenceAccount>{
+public interface ConferenceAccountRepository extends JpaRepository<ConferenceAccount, Long>, 
+			QueryDslPredicateExecutor<ConferenceAccount>{
 
 }
