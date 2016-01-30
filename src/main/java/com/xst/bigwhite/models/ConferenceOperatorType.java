@@ -6,10 +6,21 @@ package com.xst.bigwhite.models;
  *
  */
 public enum ConferenceOperatorType {
+	/**
+	 * 建立会议
+	 */
 	 CREATE,
+	 /**
+	  * 继续会议
+	  */
 	 REOPEN,
-	 JOIN,
+	 /**
+	  * 关闭
+	  */
 	 CLOSE,
+	 /**
+	  * 异常关闭
+	  */
      ABORT,
 }
 

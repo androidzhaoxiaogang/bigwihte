@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -42,9 +44,11 @@ public class Conference implements Serializable {
 	 * 会议编号
 	 */
 	@NotBlank(message="会议编号不能为空")
+	@Column(name = "sessionId", unique = true, nullable = false, length = 50)
 	public String sessionId;
 	
 	@NotBlank(message="会议UI不能为空")
+	@Column(name = "ui", unique = true, nullable = false, length = 50)
 	public String ui;
 	
 	/**
@@ -90,6 +94,13 @@ public class Conference implements Serializable {
 	@ManyToOne
 	private Device device;
 	
+	/**
+	 * 会议的状态
+	 * 开放 暂停 关闭
+	 */
+	@Enumerated(EnumType.STRING)
+	public ConferenceStatusType status = ConferenceStatusType.OPENED;
+		
 	
 	public Integer getTotalMinutes() {
 		return totalMinutes;
@@ -187,6 +198,17 @@ public class Conference implements Serializable {
 	public void setDevice(Device device) {
 		this.device = device;
 	}
+
+	
+	public ConferenceStatusType getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(ConferenceStatusType status) {
+		this.status = status;
+	}
+
 
 	public Conference(String sessionId,String sessionName,Device device){
     	this.sessionId = sessionId;

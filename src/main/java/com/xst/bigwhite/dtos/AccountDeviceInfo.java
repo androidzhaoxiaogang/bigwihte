@@ -13,14 +13,6 @@ public class AccountDeviceInfo {
      * 帐户手机
      */
 	public String mobileno;
-	
-	public String getMobileno() {
-		return mobileno;
-	}
-
-	public void setMobileno(String mobileno) {
-		this.mobileno = mobileno;
-	}
 
 	/**
      * 大白号
@@ -51,6 +43,15 @@ public class AccountDeviceInfo {
 	 * 是否管理员审核通过
 	 */
 	public Boolean confirmed = new Boolean(false);
+	
+
+	public String getMobileno() {
+		return mobileno;
+	}
+
+	public void setMobileno(String mobileno) {
+		this.mobileno = mobileno;
+	}
 	
 	public String getDeviceno() {
 		return deviceno;

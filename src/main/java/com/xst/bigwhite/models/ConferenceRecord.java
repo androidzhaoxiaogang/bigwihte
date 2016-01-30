@@ -62,6 +62,12 @@ public class ConferenceRecord implements Serializable {
 	@Enumerated(EnumType.STRING)
 	public ConferenceOperatorType operatorType = ConferenceOperatorType.CREATE;
 
+	/**
+	 * 操作描述
+	 */
+	public String operatorDesc;
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -78,7 +84,6 @@ public class ConferenceRecord implements Serializable {
 		this.conference = conference;
 	}
 
-	
 
 	public Device getDevice() {
 		return device;
@@ -111,6 +116,16 @@ public class ConferenceRecord implements Serializable {
 
 	public void setOperatorType(ConferenceOperatorType operatorType) {
 		this.operatorType = operatorType;
+	}
+	
+	
+
+	public String getOperatorDesc() {
+		return operatorDesc;
+	}
+
+	public void setOperatorDesc(String operatorDesc) {
+		this.operatorDesc = operatorDesc;
 	}
 
 	ConferenceRecord(){

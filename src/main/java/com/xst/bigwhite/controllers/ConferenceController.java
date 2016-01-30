@@ -19,8 +19,8 @@ import com.xst.bigwhite.daos.ConferenceAccountRepository;
 import com.xst.bigwhite.daos.ConferenceRecordRepository;
 import com.xst.bigwhite.daos.ConferenceRepository;
 import com.xst.bigwhite.daos.DeviceRepository;
+import com.xst.bigwhite.dtos.JoinConferenceRequest;
 import com.xst.bigwhite.dtos.RegisterConferenceRequest;
-import com.xst.bigwhite.dtos.RegisterConferenceResponse;
 import com.xst.bigwhite.exception.RestRuntimeException;
 import com.xst.bigwhite.models.Account;
 import com.xst.bigwhite.models.Conference;
@@ -69,54 +69,53 @@ public class ConferenceController {
 	 */
 	@RequestMapping(value = "/registry", method = RequestMethod.POST)
 	@ResponseBody
-	RegisterConferenceResponse registryConference(@RequestBody RegisterConferenceRequest input) {
-		RegisterConferenceResponse response = new RegisterConferenceResponse();
-		
+	Boolean registryConference(@RequestBody RegisterConferenceRequest input) {
 		String deviceno = input.deviceno;
 		String ui = input.ui;
 		String sessionId = input.sessionId;
 		String sessionName = input.sessionname;
 		
-		response.setDeviceno(deviceno);
-		
 		Optional<Device> deviced = deviceRepository.findTop1Byno(deviceno);
 		if(deviced.isPresent()){
 			Device device = deviced.get();
-			if(sessionId!=null && sessionId.trim().length()>0){  //会议已经存在
+			
 				Optional<Conference> conferenced = conferenceRepository.findTop1BySessionIdAndUi(sessionId, ui);
 				if(conferenced.isPresent()){
 						Conference conference = conferenced.get();
-					
 						//conference.setSessionname(sessionName);
 						conference.setActiveTime(new Date());
 						conferenceRepository.save(conference);
 						
 						ConferenceRecord conferenceRecord = new ConferenceRecord(conference,device,ConferenceOperatorType.REOPEN);
 						conferenceRecordRepository.save(conferenceRecord);
-						
-						response.setSessionId(conference.getSessionId());
-						response.setUi(conference.getUi());
-						response.setSessionname(conference.getSessionname());
+				}else{   //建立新的会议
+					Conference conference = new Conference(sessionId,sessionName,device);
+					conference.setActiveTime(new Date());
+					Conference regConference = conferenceRepository.save(conference);
 					
-				}else{
-					throw new RestRuntimeException("会议会话:" + input.sessionId + "不存在!");
+					ConferenceRecord conferenceRecord = new ConferenceRecord(conference,device,ConferenceOperatorType.CREATE);
+					conferenceRecordRepository.save(conferenceRecord);
+				   
 				}
-			}else{   //建立新的会议
-				Conference conference = new Conference(sessionId,sessionName,device);
-				Conference regConference = conferenceRepository.save(conference);
-				
-				ConferenceRecord conferenceRecord = new ConferenceRecord(conference,device,ConferenceOperatorType.CREATE);
-				conferenceRecordRepository.save(conferenceRecord);
-				
-				response.setSessionId(sessionId);
-				response.setSessionname(sessionName);
-			}
 			
 		}else{
 			throw new RestRuntimeException("设备号:" + input.deviceno + "不存在!");
 		}
 		
-		return response;
+		return true;
     }
+	
+	/**
+	 * 参加会议
+	 * @param input
+	 * @return
+	 */
+	@RequestMapping(value = "/join", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean joinConference(@RequestBody JoinConferenceRequest input) {
+		
+	
+	   return true;
+	}
 	
 }
