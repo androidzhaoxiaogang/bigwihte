@@ -23,4 +23,21 @@ public class RegisterConferenceRequest extends ConferenceRequest{
 		this.sessionname = sessionname;
 	}
 	
+	/**
+	 * 设备号
+	 * 备注 : 大白号
+	 */
+	@NotBlank
+	public String deviceno;
+	
+	
+	public String getDeviceno() {
+		return deviceno;
+	}
+
+	public void setDeviceno(String deviceno) {
+		this.deviceno = deviceno;
+	}
+
+	
 }

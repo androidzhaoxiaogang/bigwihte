@@ -19,14 +19,18 @@ import com.xst.bigwhite.daos.ConferenceAccountRepository;
 import com.xst.bigwhite.daos.ConferenceRecordRepository;
 import com.xst.bigwhite.daos.ConferenceRepository;
 import com.xst.bigwhite.daos.DeviceRepository;
+import com.xst.bigwhite.dtos.ConferenceAccountRequest;
+import com.xst.bigwhite.dtos.ConferenceAccountResponse;
 import com.xst.bigwhite.dtos.ConferenceActionRequest;
 import com.xst.bigwhite.dtos.ConferenceRequest;
+import com.xst.bigwhite.dtos.ConferenceResponse;
 import com.xst.bigwhite.dtos.RegisterConferenceRequest;
 import com.xst.bigwhite.exception.RestRuntimeException;
 import com.xst.bigwhite.models.Account;
 import com.xst.bigwhite.models.Conference;
 import com.xst.bigwhite.models.ConferenceOperatorType;
 import com.xst.bigwhite.models.ConferenceRecord;
+import com.xst.bigwhite.models.ConferenceStatusType;
 import com.xst.bigwhite.models.Device;
 import com.xst.bigwhite.utils.SMSManager;
 import com.xst.bigwhite.utils.UUIDGenerator;
@@ -85,6 +89,7 @@ public class ConferenceController {
 						Conference conference = conferenced.get();
 						//conference.setSessionname(sessionName);
 						conference.setActiveTime(new Date());
+						conference.setStatus(ConferenceStatusType.OPENED);
 						conferenceRepository.save(conference);
 						
 						ConferenceRecord conferenceRecord = new ConferenceRecord(conference,device,ConferenceOperatorType.REOPEN);
@@ -92,6 +97,7 @@ public class ConferenceController {
 				}else{   //建立新的会议
 					Conference conference = new Conference(sessionId,sessionName,device);
 					conference.setActiveTime(new Date());
+					conference.setStatus(ConferenceStatusType.OPENED);
 					Conference regConference = conferenceRepository.save(conference);
 					
 					ConferenceRecord conferenceRecord = new ConferenceRecord(conference,device,ConferenceOperatorType.CREATE);
@@ -109,16 +115,16 @@ public class ConferenceController {
 	/**
 	 * 一个会议的详细信息 
 	 * 会议名称 参与的用户等等
-	 * 
 	 * @param input
 	 * @return
 	 */
 	@RequestMapping(value = "/details", method = RequestMethod.POST)
 	@ResponseBody
-	Boolean joinConference(@RequestBody ConferenceRequest input) {
+	ConferenceResponse detailsOfConference(@RequestBody ConferenceRequest input) {
 		String ui = input.ui;
 		String sessionId = input.sessionId;
 		
+		ConferenceResponse  response = new ConferenceResponse();
 		Optional<Conference> conferenced = conferenceRepository.findTop1BySessionIdAndUi(sessionId, ui);
 		if (conferenced.isPresent()) {
 
@@ -126,11 +132,39 @@ public class ConferenceController {
 			throw new RestRuntimeException("会议号:" + input.ui + "不存在!");
 		}
 		
-		return true;
+		return response;
 	}
+	
+	
+	/**
+	 * 用户参与一个会议的详细信息 
+	 * 会议名称 参与的用户等等
+	 * @param input
+	 * @return
+	 */
+	@RequestMapping(value = "/accountDetails", method = RequestMethod.POST)
+	@ResponseBody
+	ConferenceAccountResponse detailsAccountOfConference(@RequestBody ConferenceAccountRequest input) {
+		String ui = input.ui;
+		String sessionId = input.sessionId;
+		
+		ConferenceAccountResponse  response = new ConferenceAccountResponse();
+		Optional<Conference> conferenced = conferenceRepository.findTop1BySessionIdAndUi(sessionId, ui);
+		if (conferenced.isPresent()) {
+
+		}else{
+			throw new RestRuntimeException("会议号:" + input.ui + "不存在!");
+		}
+		
+		return response;
+	}
+	
+	
+	
 
 	/**
-	 * 参加会议
+	 * 修改参加会议信息
+	 * 包括用户的信息和会议状态
 	 * @param input
 	 * @return
 	 */

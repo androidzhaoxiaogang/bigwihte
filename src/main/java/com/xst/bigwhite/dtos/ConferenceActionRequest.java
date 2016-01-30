@@ -9,7 +9,7 @@ import com.xst.bigwhite.models.ConferenceAccountActionType;
  * @author Administrator
  *
  */
-public class ConferenceActionRequest extends ConferenceInfo {
+public class ConferenceActionRequest extends ConferenceRequest {
 	/**
      * 帐户手机
      */

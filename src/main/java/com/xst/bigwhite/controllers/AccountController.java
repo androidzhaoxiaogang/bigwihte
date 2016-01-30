@@ -439,13 +439,66 @@ public class AccountController {
 
 	/**
 	 * 查询是否审核通过设备(申请的绑定到指定的设备列表 )
+	 * 
 	 * @param ConfirmAccountRequest
-	 * @return Boolean
+	 * @return ArrayList<AccountDeviceInfo>
+	 */
+	@RequestMapping(value = "/confirm", method = RequestMethod.POST)
+	@ResponseBody
+	ArrayList<AccountDeviceInfo> confirmByAccount(@RequestBody RegisterMobileRequest input) {
+
+		ArrayList<AccountDeviceInfo> accountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
+
+		Iterable<AccountDevice> deviceInfoes = getAccountDeviceByAccountMobile(input.mobileno);
+		if (deviceInfoes != null && deviceInfoes.iterator().hasNext()) {
+			for (AccountDevice accountDevice : deviceInfoes) {
+				if (accountDevice.getAccount() != null && accountDevice.getDevice() != null) {
+
+					Iterable<AccountDevice> devices = getAccountDeviceByDeviceno(accountDevice.getDevice().no);
+					if (devices != null && devices.iterator().hasNext()) {
+						for (AccountDevice accountDeviceInfo : devices) {
+
+							AccountDeviceInfo item = AccountDeviceInfo.mapping(accountDeviceInfo);
+							accountDeviceInfoes.add(item);
+
+						}
+					}
+				}
+			}
+		}
+
+		return accountDeviceInfoes;
+	}
+	
+	
+	
+	private Iterable<AccountDevice> getAccountDeviceByAccountMobile(String mobileno) {
+		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
+		QAccount qAccount = QAccount.account;
+		QDevice qDevice = QDevice.device;
+		
+		BooleanExpression account = qAccount.mobileno.eq(mobileno);
+
+		JPAQuery query = new JPAQuery(entityManager);
+		Iterable<AccountDevice> accountdevices = query.from(qAccountDevice)
+			 .leftJoin(qAccountDevice.account,qAccount).fetch()
+			 .leftJoin(qAccountDevice.device,qDevice).fetch()
+			 .where(account)
+			 .list(qAccountDevice);
+	
+		return accountdevices;
+	}
+
+	/**
+	 * 查询是否审核通过设备(申请的绑定到指定的设备列表 )
+	 * 
+	 * @param ConfirmAccountRequest
+	 * @return ArrayList<AccountDeviceInfo>
 	 */
 	@RequestMapping(value = "/confirms", method = RequestMethod.POST)
 	@ResponseBody
 	ArrayList<AccountDeviceInfo> confirmAccounts(@RequestBody ConfirmAccountRequest input) {
-		
+
 		ArrayList<AccountDeviceInfo> accountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
 
 		Iterable<AccountDevice> deviceInfoes = getAccountDeviceByMaster(input.mobileno);
@@ -456,16 +509,16 @@ public class AccountController {
 					Iterable<AccountDevice> devices = getAccountDeviceByDeviceno(accountDevice.getDevice().no);
 					if (devices != null && devices.iterator().hasNext()) {
 						for (AccountDevice accountDeviceInfo : devices) {
-							if (accountDeviceInfo.confirmed.equals(input.yesno)) {
-								AccountDeviceInfo item = AccountDeviceInfo.mapping(accountDeviceInfo);
-								accountDeviceInfoes.add(item);
-							}
+
+							AccountDeviceInfo item = AccountDeviceInfo.mapping(accountDeviceInfo);
+							accountDeviceInfoes.add(item);
+
 						}
 					}
 				}
 			}
 		}
-		
+
 		return accountDeviceInfoes;
 	}
 	

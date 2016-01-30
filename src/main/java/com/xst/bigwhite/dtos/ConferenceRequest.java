@@ -1,23 +1,34 @@
 package com.xst.bigwhite.dtos;
 
-import org.hibernate.validator.constraints.NotBlank;
-
-public class ConferenceRequest extends ConferenceInfo {
+public class ConferenceRequest {
+	
 	/**
-	 * 设备号
-	 * 备注 : 大白号
+	 * 会议回话ID
 	 */
-	@NotBlank
-	public String deviceno;
-	
-	
-	public String getDeviceno() {
-		return deviceno;
+    public String sessionId;
+    
+    /**
+     * 会议UI
+     */
+    public String ui;
+    
+
+	public String getSessionId() {
+		return sessionId;
 	}
 
-	public void setDeviceno(String deviceno) {
-		this.deviceno = deviceno;
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+	}
+	
+
+	public String getUi() {
+		return ui;
 	}
 
+	public void setUi(String ui) {
+		this.ui = ui;
+	}
+	
 
 }
