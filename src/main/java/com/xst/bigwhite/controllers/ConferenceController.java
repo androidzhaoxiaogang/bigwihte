@@ -19,7 +19,8 @@ import com.xst.bigwhite.daos.ConferenceAccountRepository;
 import com.xst.bigwhite.daos.ConferenceRecordRepository;
 import com.xst.bigwhite.daos.ConferenceRepository;
 import com.xst.bigwhite.daos.DeviceRepository;
-import com.xst.bigwhite.dtos.JoinConferenceRequest;
+import com.xst.bigwhite.dtos.ConferenceActionRequest;
+import com.xst.bigwhite.dtos.ConferenceRequest;
 import com.xst.bigwhite.dtos.RegisterConferenceRequest;
 import com.xst.bigwhite.exception.RestRuntimeException;
 import com.xst.bigwhite.models.Account;
@@ -62,7 +63,7 @@ public class ConferenceController {
 	/*@Autowired
 	SMSManager smsManager;*/
 	
-	 /* 手机申请会议
+	 /** 手机申请会议
 	 * 
 	 * @param RegisterConferenceRequest
 	 * @return RegisterConferenceResponse
@@ -106,13 +107,36 @@ public class ConferenceController {
     }
 	
 	/**
+	 * 一个会议的详细信息 
+	 * 会议名称 参与的用户等等
+	 * 
+	 * @param input
+	 * @return
+	 */
+	@RequestMapping(value = "/details", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean joinConference(@RequestBody ConferenceRequest input) {
+		String ui = input.ui;
+		String sessionId = input.sessionId;
+		
+		Optional<Conference> conferenced = conferenceRepository.findTop1BySessionIdAndUi(sessionId, ui);
+		if (conferenced.isPresent()) {
+
+		}else{
+			throw new RestRuntimeException("会议号:" + input.ui + "不存在!");
+		}
+		
+		return true;
+	}
+
+	/**
 	 * 参加会议
 	 * @param input
 	 * @return
 	 */
-	@RequestMapping(value = "/join", method = RequestMethod.POST)
+	@RequestMapping(value = "/action", method = RequestMethod.POST)
 	@ResponseBody
-	Boolean joinConference(@RequestBody JoinConferenceRequest input) {
+	Boolean actionConference(@RequestBody ConferenceActionRequest input) {
 		
 	
 	   return true;

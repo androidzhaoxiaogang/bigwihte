@@ -51,12 +51,12 @@ public class ConferenceAccount implements Serializable {
 	 * 在线 或者离线
 	 */
 	@Enumerated(EnumType.STRING)
-	public ConferenceJoinStatusType status = ConferenceJoinStatusType.ONLINE;
+	public ConferenceAccountStatusType status = ConferenceAccountStatusType.ONLINE;
 	
 	/**
 	 * 会议总分钟数
 	 */
-	public int minutes;
+	public Integer totoalMinutes = new Integer(0);
 
 	public Long getId() {
 		return id;
@@ -88,23 +88,23 @@ public class ConferenceAccount implements Serializable {
 	}
 
 
-	public ConferenceJoinStatusType getStatus() {
+	public ConferenceAccountStatusType getStatus() {
 		return status;
 	}
 
 
-	public void setStatus(ConferenceJoinStatusType status) {
+	public void setStatus(ConferenceAccountStatusType status) {
 		this.status = status;
 	}
 
 
-	public int getMinutes() {
-		return minutes;
+	public Integer getTotoalMinutes() {
+		return totoalMinutes;
 	}
 
 
-	public void setMinutes(int minutes) {
-		this.minutes = minutes;
+	public void setTotoalMinutes(Integer totoalMinutes) {
+		this.totoalMinutes = totoalMinutes;
 	}
 
 
