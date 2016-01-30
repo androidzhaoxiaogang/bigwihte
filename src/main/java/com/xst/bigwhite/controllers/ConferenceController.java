@@ -24,6 +24,7 @@ import com.xst.bigwhite.dtos.ConferenceAccountResponse;
 import com.xst.bigwhite.dtos.ConferenceActionRequest;
 import com.xst.bigwhite.dtos.ConferenceRequest;
 import com.xst.bigwhite.dtos.ConferenceResponse;
+import com.xst.bigwhite.dtos.ConferenceUpdateRequest;
 import com.xst.bigwhite.dtos.RegisterConferenceRequest;
 import com.xst.bigwhite.exception.RestRuntimeException;
 import com.xst.bigwhite.models.Account;
@@ -113,6 +114,21 @@ public class ConferenceController {
     }
 	
 	/**
+	 * 会议状态信息
+	 * 包括用户的信息和会议状态
+	 * @param input
+	 * @return
+	 */
+	@RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean updateStatusConference(@RequestBody ConferenceUpdateRequest input) {
+		
+	
+	   return true;
+	}
+	
+	
+	/**
 	 * 一个会议的详细信息 
 	 * 会议名称 参与的用户等等
 	 * @param input
@@ -159,8 +175,7 @@ public class ConferenceController {
 		return response;
 	}
 	
-	
-	
+
 
 	/**
 	 * 修改参加会议信息
@@ -168,9 +183,9 @@ public class ConferenceController {
 	 * @param input
 	 * @return
 	 */
-	@RequestMapping(value = "/action", method = RequestMethod.POST)
+	@RequestMapping(value = "/accountAction", method = RequestMethod.POST)
 	@ResponseBody
-	Boolean actionConference(@RequestBody ConferenceActionRequest input) {
+	Boolean accountActionConference(@RequestBody ConferenceActionRequest input) {
 		
 	
 	   return true;

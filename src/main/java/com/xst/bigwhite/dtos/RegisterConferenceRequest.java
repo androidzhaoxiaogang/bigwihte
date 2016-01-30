@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.NotBlank;
  * @author wangjun
  *
  */
-public class RegisterConferenceRequest extends ConferenceRequest{
+public class RegisterConferenceRequest  extends ConferenceDeviceRequest {
 	
     /**
 	 * 会议名称
@@ -22,22 +22,5 @@ public class RegisterConferenceRequest extends ConferenceRequest{
 	public void setSessionname(String sessionname) {
 		this.sessionname = sessionname;
 	}
-	
-	/**
-	 * 设备号
-	 * 备注 : 大白号
-	 */
-	@NotBlank
-	public String deviceno;
-	
-	
-	public String getDeviceno() {
-		return deviceno;
-	}
-
-	public void setDeviceno(String deviceno) {
-		this.deviceno = deviceno;
-	}
-
 	
 }

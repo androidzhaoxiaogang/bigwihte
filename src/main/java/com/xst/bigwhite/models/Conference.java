@@ -55,7 +55,7 @@ public class Conference implements Serializable {
 	 * 会议名称
 	 */
 	@NotBlank(message="会议名称不能为空")
-	public String sessionname;
+	public String sessionName;
 	
 	/**
 	 * 创建日期
@@ -141,13 +141,13 @@ public class Conference implements Serializable {
 	}
 
 
-	public String getSessionname() {
-		return sessionname;
+	public String getSessionName() {
+		return sessionName;
 	}
 
 
-	public void setSessionname(String sessionname) {
-		this.sessionname = sessionname;
+	public void setSessionName(String sessionName) {
+		this.sessionName = sessionName;
 	}
 
 
@@ -212,13 +212,13 @@ public class Conference implements Serializable {
 
 	public Conference(String sessionId,String sessionName,Device device){
     	this.sessionId = sessionId;
-    	this.sessionname = sessionName;
+    	this.sessionName = sessionName;
     	this.device = device;
     }
 	
 	public Conference(String sessionId,String sessionName){
     	this.sessionId = sessionId;
-    	this.sessionname = sessionName;
+    	this.sessionName = sessionName;
     }
 	
 	Conference() { // jpa only

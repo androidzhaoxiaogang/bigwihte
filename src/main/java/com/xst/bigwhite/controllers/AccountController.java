@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -33,6 +34,8 @@ import com.xst.bigwhite.dtos.AccountDeviceInfo;
 import com.xst.bigwhite.dtos.AccountInfoRequest;
 import com.xst.bigwhite.dtos.AccountInfoResponse;
 import com.xst.bigwhite.dtos.ChechVerifyCodeRequest;
+import com.xst.bigwhite.dtos.ConferenceAccountRequest;
+import com.xst.bigwhite.dtos.ConferenceAccountResponse;
 import com.xst.bigwhite.dtos.ConfirmAccountRequest;
 import com.xst.bigwhite.dtos.RegisterMobileRequest;
 import com.xst.bigwhite.dtos.RegisterMobileResponse;
@@ -579,6 +582,21 @@ public class AccountController {
 		this.accountRepository.findByUsernameOrMobileno(username, mobileno)
 				.orElseThrow(() -> new RestRuntimeException("用户:" + username + "/" + mobileno + "不存在!"));
 	}*/
+	
+	/**
+	 * 查询当前账户下所有的会议信息
+	 * 
+	 * @param ConferenceAccountResponse
+	 * @return ArrayList<ConferenceAccountResponse>
+	 */
+	@RequestMapping(value = "/conferences", method = RequestMethod.POST)
+	@ResponseBody
+	List<ConferenceAccountResponse> conferenceAccounts(@RequestBody ConferenceAccountRequest input) {
+		List<ConferenceAccountResponse> reponses = new  ArrayList<ConferenceAccountResponse>();
+		
+		return reponses;
+	}
+	
 }
 
 /*

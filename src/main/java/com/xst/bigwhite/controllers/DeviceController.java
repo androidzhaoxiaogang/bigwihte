@@ -21,6 +21,9 @@ import com.xst.bigwhite.daos.AccountDeviceRepository;
 import com.xst.bigwhite.daos.AccountRepository;
 import com.xst.bigwhite.daos.DeviceRepository;
 import com.xst.bigwhite.daos.VerifyMessageRepository;
+import com.xst.bigwhite.dtos.ConferenceAccountRequest;
+import com.xst.bigwhite.dtos.ConferenceAccountResponse;
+import com.xst.bigwhite.dtos.ConferenceDeviceRequest;
 import com.xst.bigwhite.dtos.DeviceAccountInfo;
 import com.xst.bigwhite.dtos.DeviceInfoResponse;
 import com.xst.bigwhite.dtos.RegisterDeviceRequest;
@@ -144,6 +147,21 @@ public class DeviceController {
 
 		return response;
 	}
+	
+	/**
+	 * 查询当设备下所有的会议信息
+	 * 
+	 * @param ConferenceDeviceRequest
+	 * @return ArrayList<ConferenceAccountResponse>
+	 */
+	@RequestMapping(value = "/conferences", method = RequestMethod.POST)
+	@ResponseBody
+	List<ConferenceAccountResponse> deviceConferences(@RequestBody ConferenceDeviceRequest input) {
+		List<ConferenceAccountResponse> reponses = new  ArrayList<ConferenceAccountResponse>();
+		
+		return reponses;
+	}
+	
 
 	@PersistenceContext
     private EntityManager entityManager;
