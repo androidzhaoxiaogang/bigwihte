@@ -167,7 +167,7 @@ public class AccountController {
 			throw new RestRuntimeException("密码不能为空,请先修改密码!");
 		}
 		
-		Optional<Account> accounted = accountRepository.findTop1ByMobilenoOrPassword(mobileno, password);
+		Optional<Account> accounted = accountRepository.findTop1ByMobilenoAndPassword(mobileno, password);
 
 		if (accounted.isPresent()) {
 			Account account = accounted.get();
