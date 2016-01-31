@@ -19,6 +19,7 @@ import org.hibernate.event.spi.SaveOrUpdateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,6 +34,7 @@ import com.xst.bigwhite.daos.*;
 import com.xst.bigwhite.dtos.AccountDeviceInfo;
 import com.xst.bigwhite.dtos.AccountInfoRequest;
 import com.xst.bigwhite.dtos.AccountInfoResponse;
+import com.xst.bigwhite.dtos.AuthorizeInfoRequest;
 import com.xst.bigwhite.dtos.ChechVerifyCodeRequest;
 import com.xst.bigwhite.dtos.ConferenceAccountRequest;
 import com.xst.bigwhite.dtos.ConferenceAccountResponse;
@@ -52,6 +54,7 @@ import com.xst.bigwhite.models.QDevice;
 import com.xst.bigwhite.models.VerifyMessage;
 import com.xst.bigwhite.utils.Helpers;
 import com.xst.bigwhite.utils.SMSManager;
+import com.justalk.cloud.Signer;
 
 @Controller
 @EnableAutoConfiguration
@@ -154,7 +157,25 @@ public class AccountController {
 	}
 
 	
-
+	@Value("${justalk.prikey}")
+	String fileName;
+	
+	/**
+	 * 手机号登入
+	 * 
+	 * @param AccountInfoRequest
+	 * @return AccountInfoResponse
+	 */
+	@RequestMapping(value = "/authorize", method = RequestMethod.POST)
+	@ResponseBody
+	String authorize(@RequestBody AuthorizeInfoRequest input) {
+		 
+		 String id = input.id; 
+		 String nonce = input.nonce; 
+		 int expires = 3600 * 24 *1;
+		 
+		 return Signer.signWithFile(fileName,id,nonce,expires);
+	}
 	/**
 	 * 手机号登入
 	 * 
