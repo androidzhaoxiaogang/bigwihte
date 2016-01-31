@@ -34,6 +34,11 @@ public class ConferenceActionRequest extends ConferenceRequest {
 	 * 分钟数
 	 */
 	public Integer minutes =new Integer(0);
+
+	/**
+	 * 说明文字
+	 */
+	public String operatorDesc;
 	
 	
 	public String getMobileno() {
@@ -75,6 +80,14 @@ public class ConferenceActionRequest extends ConferenceRequest {
 
 	public void setActionType(ConferenceAccountActionType actionType) {
 		this.actionType = actionType;
+	}
+
+	public String getOperatorDesc() {
+		return operatorDesc;
+	}
+
+	public void setOperatorDesc(String operatorDesc) {
+		this.operatorDesc = operatorDesc;
 	}
 
 	

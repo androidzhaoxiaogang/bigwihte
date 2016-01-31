@@ -61,6 +61,12 @@ public class ConferenceAccountRecord implements Serializable {
 	 */
 	@Enumerated(EnumType.STRING)
 	public ConferenceAccountActionType actionType = ConferenceAccountActionType.CONNECT;
+	
+	/**
+	 * 分钟数
+	 */
+	public Integer minutes = new Integer(0);
+
 
 	/**
 	 * 操作描述
@@ -126,6 +132,16 @@ public class ConferenceAccountRecord implements Serializable {
 	public void setOperatorDesc(String operatorDesc) {
 		this.operatorDesc = operatorDesc;
 	}
+
+	public Integer getMinutes() {
+		return minutes;
+	}
+
+
+	public void setMinutes(Integer minutes) {
+		this.minutes = minutes;
+	}
+
 
 	ConferenceAccountRecord(){
 		//JPA

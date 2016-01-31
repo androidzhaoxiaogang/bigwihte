@@ -32,9 +32,12 @@ import com.xst.bigwhite.dtos.ScanDeviceRequest;
 import com.xst.bigwhite.dtos.ScanDeviceResponse;
 import com.xst.bigwhite.exception.RestRuntimeException;
 import com.xst.bigwhite.models.AccountDevice;
+import com.xst.bigwhite.models.ConferenceAccount;
 import com.xst.bigwhite.models.Device;
 import com.xst.bigwhite.models.QAccount;
 import com.xst.bigwhite.models.QAccountDevice;
+import com.xst.bigwhite.models.QConference;
+import com.xst.bigwhite.models.QConferenceAccount;
 import com.xst.bigwhite.models.QDevice;
 import com.xst.bigwhite.utils.Helpers;
 
@@ -163,6 +166,25 @@ public class DeviceController {
 	}
 	
 
+	private Iterable<ConferenceAccount> getAccountConferenceByDeviceno(String no) {
+		QConferenceAccount qConferenceAccount = QConferenceAccount.conferenceAccount;
+		QAccount qAccount = QAccount.account;
+		QConference qConference = QConference.conference;
+		QDevice qDevice = QDevice.device;
+		BooleanExpression device = qDevice.no.eq(no);
+
+		JPAQuery query = new JPAQuery(entityManager);
+		Iterable<ConferenceAccount> accountdevices = query.from(qConferenceAccount)
+			 .leftJoin(qConferenceAccount.account,qAccount).fetch()
+			 .leftJoin(qConferenceAccount.conference,qConference).fetch()
+			 .leftJoin(qConference.device,qDevice).fetch()
+			 .where(device)
+			 .list(qConferenceAccount);
+	
+		return accountdevices;
+	}
+
+	
 	@PersistenceContext
     private EntityManager entityManager;
 	

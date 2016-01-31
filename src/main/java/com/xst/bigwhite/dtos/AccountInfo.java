@@ -1,5 +1,11 @@
 package com.xst.bigwhite.dtos;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import com.xst.bigwhite.models.ConferenceAccount;
+
 public class AccountInfo {
 	/**
 	 * 手机号
@@ -42,5 +48,28 @@ public class AccountInfo {
 
 	public void setMobileno(String mobileno) {
 		this.mobileno = mobileno;
+	}
+
+	public static List<AccountInfo> mappingList(Set<ConferenceAccount> accounts) {
+		List<AccountInfo> items = new ArrayList<>();
+		
+		if(accounts!=null && !accounts.isEmpty()){
+		     for(ConferenceAccount account : accounts){
+		    	 AccountInfo item = AccountInfo.mapping(account);
+		    	 items.add(item);
+		     }
+		}
+		
+		return items;
+	}
+
+	private static AccountInfo mapping(ConferenceAccount account) {
+		AccountInfo item = new AccountInfo();
+		
+		item.setMobileno(account.getAccount().mobileno);
+		item.setNick(account.getAccount().username);
+		item.setUsername(account.getAccount().username);
+		
+		return item;
 	}
 }

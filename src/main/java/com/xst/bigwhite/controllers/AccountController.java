@@ -42,9 +42,12 @@ import com.xst.bigwhite.dtos.RegisterMobileResponse;
 import com.xst.bigwhite.exception.RestRuntimeException;
 import com.xst.bigwhite.models.Account;
 import com.xst.bigwhite.models.AccountDevice;
+import com.xst.bigwhite.models.ConferenceAccount;
 import com.xst.bigwhite.models.Device;
 import com.xst.bigwhite.models.QAccount;
 import com.xst.bigwhite.models.QAccountDevice;
+import com.xst.bigwhite.models.QConference;
+import com.xst.bigwhite.models.QConferenceAccount;
 import com.xst.bigwhite.models.QDevice;
 import com.xst.bigwhite.models.VerifyMessage;
 import com.xst.bigwhite.utils.Helpers;
@@ -455,18 +458,8 @@ public class AccountController {
 		Iterable<AccountDevice> deviceInfoes = getAccountDeviceByAccountMobile(input.mobileno);
 		if (deviceInfoes != null && deviceInfoes.iterator().hasNext()) {
 			for (AccountDevice accountDevice : deviceInfoes) {
-				if (accountDevice.getAccount() != null && accountDevice.getDevice() != null) {
-
-					Iterable<AccountDevice> devices = getAccountDeviceByDeviceno(accountDevice.getDevice().no);
-					if (devices != null && devices.iterator().hasNext()) {
-						for (AccountDevice accountDeviceInfo : devices) {
-
-							AccountDeviceInfo item = AccountDeviceInfo.mapping(accountDeviceInfo);
-							accountDeviceInfoes.add(item);
-
-						}
-					}
-				}
+				AccountDeviceInfo item = AccountDeviceInfo.mapping(accountDevice);
+				accountDeviceInfoes.add(item);
 			}
 		}
 
@@ -592,10 +585,41 @@ public class AccountController {
 	@RequestMapping(value = "/conferences", method = RequestMethod.POST)
 	@ResponseBody
 	List<ConferenceAccountResponse> conferenceAccounts(@RequestBody ConferenceAccountRequest input) {
-		List<ConferenceAccountResponse> reponses = new  ArrayList<ConferenceAccountResponse>();
+		List<ConferenceAccountResponse>  response = new ArrayList<ConferenceAccountResponse>();
 		
-		return reponses;
+		Iterable<ConferenceAccount> conferences = getAccountConferenceByAccountMobile(input.mobileno);
+		if (conferences!=null && conferences.iterator().hasNext()) {
+			for(ConferenceAccount conference : conferences){
+				ConferenceAccountResponse item = ConferenceAccountResponse.mapping(conference);
+				response.add(item);
+			}
+		}else{
+			throw new RestRuntimeException("用户:" + input.mobileno + "会议不存在!");
+		}
+		
+		return response;
 	}
+	
+	
+	private Iterable<ConferenceAccount> getAccountConferenceByAccountMobile(String mobileno) {
+		QConferenceAccount qConferenceAccount = QConferenceAccount.conferenceAccount;
+		QAccount qAccount = QAccount.account;
+		QConference qConference = QConference.conference;
+		QDevice qDevice = QDevice.device;
+		
+		BooleanExpression account = qAccount.mobileno.eq(mobileno);
+
+		JPAQuery query = new JPAQuery(entityManager);
+		Iterable<ConferenceAccount> accountdevices = query.from(qConferenceAccount)
+			 .leftJoin(qConferenceAccount.account,qAccount).fetch()
+			 .leftJoin(qConferenceAccount.conference,qConference).fetch()
+			 .leftJoin(qConference.device,qDevice).fetch()
+			 .where(account)
+			 .list(qConferenceAccount);
+	
+		return accountdevices;
+	}
+
 	
 }
 

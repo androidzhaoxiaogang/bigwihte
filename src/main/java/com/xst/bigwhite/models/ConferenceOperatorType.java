@@ -13,7 +13,7 @@ public enum ConferenceOperatorType {
 	 /**
 	  * 继续会议
 	  */
-	 REOPEN,
+	 OPEN,
 	 /**
 	  * 关闭
 	  */

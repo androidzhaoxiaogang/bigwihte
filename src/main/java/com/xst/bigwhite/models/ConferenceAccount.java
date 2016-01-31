@@ -56,7 +56,7 @@ public class ConferenceAccount implements Serializable {
 	/**
 	 * 会议总分钟数
 	 */
-	public Integer totoalMinutes = new Integer(0);
+	public Integer totalMinutes = new Integer(0);
 
 	public Long getId() {
 		return id;
@@ -98,13 +98,13 @@ public class ConferenceAccount implements Serializable {
 	}
 
 
-	public Integer getTotoalMinutes() {
-		return totoalMinutes;
+	public Integer getTotalMinutes() {
+		return totalMinutes;
 	}
 
 
-	public void setTotoalMinutes(Integer totoalMinutes) {
-		this.totoalMinutes = totoalMinutes;
+	public void setTotalMinutes(Integer totalMinutes) {
+		this.totalMinutes = totalMinutes;
 	}
 
 

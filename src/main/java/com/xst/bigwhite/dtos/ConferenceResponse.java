@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.xst.bigwhite.models.Conference;
 import com.xst.bigwhite.models.ConferenceStatusType;
 
 /**
@@ -19,7 +20,7 @@ public class ConferenceResponse {
 	 * 会议名称
 	 */
 	@NotBlank(message="会议名称不能为空")
-	public String sessionname;
+	public String sessionName;
 	
 	/**
 	 * 创建日期
@@ -53,14 +54,13 @@ public class ConferenceResponse {
 	 */
 	public List<AccountInfo> accounts =new ArrayList<>();
 
-
-	public String getSessionname() {
-		return sessionname;
+	public String getSessionName() {
+		return sessionName;
 	}
 
 
-	public void setSessionname(String sessionname) {
-		this.sessionname = sessionname;
+	public void setSessionName(String sessionName) {
+		this.sessionName = sessionName;
 	}
 
 
@@ -121,6 +121,20 @@ public class ConferenceResponse {
 
 	public void setAccounts(List<AccountInfo> accounts) {
 		this.accounts = accounts;
+	}
+
+
+	public static ConferenceResponse mapping(Conference conference) {
+		ConferenceResponse response = new ConferenceResponse();
+		
+		response.setActiveTime(conference.getActiveTime());
+		response.setCreateDate(conference.getCreateDate());
+		response.setEndDate(conference.getEndDate());
+		response.setSessionName(conference.getSessionName());
+		response.setStatus(conference.getStatus());
+		response.setTotalMinutes(conference.getTotalMinutes());
+		
+		return response;
 	}
 	
 	
