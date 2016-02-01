@@ -168,6 +168,20 @@
 		 	</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>jusTalk</groupId>
+			<artifactId>bcprov-jdk15on-152</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>  
+			<systemPath>${project.basedir}/lib/bcprov-jdk15on-152.jar</systemPath>  
+		</dependency>
+		<dependency>
+			<groupId>jusTalk</groupId>
+			<artifactId>signer</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>  
+			<systemPath>${project.basedir}/lib/signer.jar</systemPath>  
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -230,7 +244,6 @@
 			<name>jcenter</name>
 			<url>https://jcenter.bintray.com/</url>
 		</repository>
-
 	</repositories>
 
 </project>
