@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -23,18 +24,17 @@ import org.springframework.stereotype.Service;
 @Service
 @EnableAutoConfiguration
 public class SMSManager {
-
-	@Autowired
-    private SMSSettings smsSettings;
 	
-	@Autowired
-	public SMSManager(SMSSettings smsSettings){
-		this.smsSettings = smsSettings;
-		this._uc = smsSettings.getUseraccount();
-		this._pwd = smsSettings.getPassword();
+	public SMSManager(){
+		
 	}
 	
-	String _uc, _pwd; // 帐号，密码
+	@Value("${sms.useraccount}")
+	String _uc;
+	
+	@Value("${sms.password}")
+	String _pwd; // 帐号，密码
+
 	String _host = "http://c.kf10000.com/sdk/SMS?";
 
 	public String get_pwd() {
