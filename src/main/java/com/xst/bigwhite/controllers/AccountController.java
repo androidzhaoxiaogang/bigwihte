@@ -241,31 +241,18 @@ public class AccountController {
 		// validator.validate(input);
 		RegisterMobileResponse response = new RegisterMobileResponse();
 		Optional<Account> accountd = accountRepository.findTop1ByMobileno(input.mobileno);
-		String verifycode = Helpers.random(6);
+		
 		if (!accountd.isPresent()) {
 			Account accountNew = new Account(input.mobileno, input.mobileno);
 			accountNew.setCreatedate(new Date());
 			accountNew.setPassword("bigmax!@#");
 			accountRepository.save(accountNew);
-
-			Optional<VerifyMessage> message = verifyMessageRepository.findTop1ByMobileno(input.mobileno);
-			if (message.isPresent()) {
-				VerifyMessage verifyMessage = message.get();
-				Calendar rightNow = Calendar.getInstance();
-				rightNow.add(Calendar.MINUTE, -5);
-				if (rightNow.getTime().after(verifyMessage.getCreatedate())) {
-					saveVerifyMessage(input.mobileno, verifycode);
-					response.verfiycode = verifycode;
-				} else {
-					response.verfiycode = verifyMessage.verifycode;
-				}
-			} else {
-				saveVerifyMessage(input.mobileno, verifycode);
-				response.verfiycode = verifycode;
-			}
-
+			
+			response.setVerfiycode(getVerfiyCode(input.mobileno));
+			
 			String msgid = UUID.randomUUID().toString().replaceAll("-", "");
 			this.smsManager.sendSMS(input.mobileno, "恭喜您,注册大白账号成功!验证码为:" + response.verfiycode + "【佳视通】", msgid);
+
 		} else {
 			throw new RestRuntimeException("手机号:" + input.mobileno + "已经被注册!");
 		}
@@ -273,12 +260,52 @@ public class AccountController {
 		return response;
 	}
 	
+	 /* 获取手机验证码
+	 * 
+	 * @param RegisterMobileRequest
+	 * @return RegisterMobileResponse
+	 */
+	@RequestMapping(value = "/verfiyCode", method = RequestMethod.POST)
+	@ResponseBody
+	RegisterMobileResponse veryCode(@RequestBody RegisterMobileRequest input) {
+		RegisterMobileResponse response = new RegisterMobileResponse();
+		
+		String verifycode = getVerfiyCode(input.mobileno);
+		response.setVerfiycode(verifycode);
+		
+		String msgid = UUID.randomUUID().toString().replaceAll("-", "");
+		this.smsManager.sendSMS(input.mobileno, "您好!大白账号验证码为:" + response.verfiycode + "【佳视通】", msgid);
+
+		return response;
+	}
+	 
 	private void saveVerifyMessage(String mobileno,String verifycode){
 		VerifyMessage verifyMessage = new VerifyMessage(mobileno, verifycode);
 		verifyMessage.setCreatedate(new Date());
 		verifyMessageRepository.save(verifyMessage);
 	}
 
+    private String getVerfiyCode(String mobileno){
+    	String verifycode = Helpers.random(6);
+    	
+    	Optional<VerifyMessage> message = verifyMessageRepository.findTop1ByMobileno(mobileno);
+		if (message.isPresent()) {
+			VerifyMessage verifyMessage = message.get();
+			Calendar rightNow = Calendar.getInstance();
+			rightNow.add(Calendar.MINUTE, -5);
+			if (rightNow.getTime().after(verifyMessage.getCreatedate())) {
+				verifyMessage.setVerifycode(verifycode);
+				verifyMessageRepository.save(verifyMessage);
+			} else {
+				verifycode = verifyMessage.verifycode;
+			}
+		} else {
+			saveVerifyMessage(mobileno, verifycode);
+		}
+
+		return verifycode;
+    }
+	
 	/**
 	 * 检查验证码是否正确
 	 * 
