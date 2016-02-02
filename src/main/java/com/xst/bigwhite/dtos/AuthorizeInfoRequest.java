@@ -9,6 +9,7 @@ public class AuthorizeInfoRequest {
 	
 	/**
 	 * Cloud 帐号（由客户 APP 的授权请求中传入）
+	 * d592490821b4196cffeb5097
 	 */
 	public String id;
 	
