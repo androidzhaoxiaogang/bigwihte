@@ -1,6 +1,7 @@
 package com.xst.bigwhite.models;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -52,6 +53,16 @@ public class ConferenceAccount implements Serializable {
 	 */
 	@Enumerated(EnumType.STRING)
 	public ConferenceAccountStatusType status = ConferenceAccountStatusType.ONLINE;
+	
+	/**
+	 * 建立时间
+	 */
+	public Date createDate = new Date();
+	
+	/**
+	 * 更新时间
+	 */
+	public Date updateDate =new Date();
 	
 	/**
 	 * 会议总分钟数
@@ -107,5 +118,32 @@ public class ConferenceAccount implements Serializable {
 		this.totalMinutes = totalMinutes;
 	}
 
+    public Date getCreateDate() {
+		return createDate;
+	}
 
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
+	}
+
+
+	public	ConferenceAccount(Conference conference, Account account){
+    	this.conference = conference;
+    	this.account = account;
+    }
+    
+	ConferenceAccount(){
+		
+	}
 }

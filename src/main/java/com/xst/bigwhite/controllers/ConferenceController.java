@@ -32,6 +32,7 @@ import com.xst.bigwhite.dtos.ConferenceActionRequest;
 import com.xst.bigwhite.dtos.ConferenceRequest;
 import com.xst.bigwhite.dtos.ConferenceResponse;
 import com.xst.bigwhite.dtos.ConferenceUpdateRequest;
+import com.xst.bigwhite.dtos.JoinConferenceRequest;
 import com.xst.bigwhite.dtos.RegisterConferenceRequest;
 import com.xst.bigwhite.exception.RestRuntimeException;
 import com.xst.bigwhite.models.Account;
@@ -89,10 +90,10 @@ public class ConferenceController {
 	/*@Autowired
 	SMSManager smsManager;*/
 	
-	 /** 手机申请会议
+	 /** 大白申请会议
 	 * 
 	 * @param RegisterConferenceRequest
-	 * @return RegisterConferenceResponse
+	 * @return Boolean
 	 */
 	@RequestMapping(value = "/registry", method = RequestMethod.POST)
 	@ResponseBody
@@ -133,6 +134,40 @@ public class ConferenceController {
 		
 		return true;
     }
+	
+	 /** 手机申请加入会议
+	 * 
+	 * @param JoinConferenceRequest
+	 * @return Boolean
+	 */
+	@RequestMapping(value = "/join", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean joinConference(@RequestBody JoinConferenceRequest input) {
+		Optional<Conference> conferenced = conferenceRepository.findTop1BySessionIdAndUi(input.sessionId, input.ui);
+		if(conferenced.isPresent()){
+			Conference conference = conferenced.get();
+			Iterable<ConferenceAccount> accounts = getAccountConferenceByAccount(input.mobileno,input.sessionId, input.ui);
+			if(accounts!=null && accounts.iterator().hasNext()){
+				ConferenceAccount account = accounts.iterator().next();
+				account.setUpdateDate(new Date());
+				account.setStatus(ConferenceAccountStatusType.ONLINE);
+				conferenceAccountRepository.save(account);
+			}else{
+				Optional<Account> accounted = accountRepository.findTop1ByMobileno(input.mobileno);
+				if(accounted.isPresent()){
+					ConferenceAccount account = new ConferenceAccount(conference,accounted.get());
+					account.setStatus(ConferenceAccountStatusType.ONLINE);
+					conferenceAccountRepository.save(account);
+				}else{
+					throw new RestRuntimeException("账户:" + input.mobileno + "不存在!");
+				}
+			}
+			
+		}else{
+			throw new RestRuntimeException("会议号:" + input.sessionId + "不存在!");
+		}
+		return true;
+	}
 	
 	/**
 	 * 会议状态信息 包括用户的信息和会议状态

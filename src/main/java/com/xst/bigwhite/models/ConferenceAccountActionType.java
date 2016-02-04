@@ -15,6 +15,10 @@ public enum ConferenceAccountActionType{
 	  */
 	 RECONNECT,
 	 /**
+	  * 加入会议中
+	  */
+	 JOINING,
+	 /**
 	  * 会议中
 	  */
 	 SESSIONING,
