@@ -9,6 +9,8 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Controller;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.expr.BooleanExpression;
+import com.xst.bigwhite.BigwhiteApplication;
 import com.xst.bigwhite.daos.AccountRepository;
 import com.xst.bigwhite.daos.ConferenceAccountRecordRepository;
 import com.xst.bigwhite.daos.ConferenceAccountRepository;
@@ -36,7 +39,6 @@ import com.xst.bigwhite.dtos.JoinConferenceRequest;
 import com.xst.bigwhite.dtos.RegisterConferenceRequest;
 import com.xst.bigwhite.exception.RestRuntimeException;
 import com.xst.bigwhite.models.Account;
-import com.xst.bigwhite.models.AccountDevice;
 import com.xst.bigwhite.models.Conference;
 import com.xst.bigwhite.models.ConferenceAccount;
 import com.xst.bigwhite.models.ConferenceAccountActionType;
@@ -47,15 +49,12 @@ import com.xst.bigwhite.models.ConferenceRecord;
 import com.xst.bigwhite.models.ConferenceStatusType;
 import com.xst.bigwhite.models.Device;
 import com.xst.bigwhite.models.QAccount;
-import com.xst.bigwhite.models.QAccountDevice;
 import com.xst.bigwhite.models.QConference;
 import com.xst.bigwhite.models.QConferenceAccount;
 import com.xst.bigwhite.models.QConferenceAccountRecord;
 import com.xst.bigwhite.models.QDevice;
-import com.xst.bigwhite.utils.SMSManager;
-import com.xst.bigwhite.utils.UUIDGenerator;
 
-@SuppressWarnings("unused")
+
 @Controller
 @EnableAutoConfiguration
 @RequestMapping("/api/conference")
@@ -68,6 +67,8 @@ public class ConferenceController {
 	private final ConferenceRecordRepository conferenceRecordRepository;
 	private final ConferenceAccountRecordRepository conferenceAccountRecordRepository;
 	
+	private static final Logger log = LoggerFactory.getLogger(BigwhiteApplication.class);
+
 	@Autowired
 	public ConferenceController(AccountRepository accountRepository,
 			DeviceRepository deviceRepository,
@@ -118,12 +119,12 @@ public class ConferenceController {
 						ConferenceRecord conferenceRecord = new ConferenceRecord(conference,device,ConferenceOperatorType.OPEN);
 						conferenceRecordRepository.save(conferenceRecord);
 				}else{   //建立新的会议
-					Conference conference = new Conference(sessionId,sessionName,device);
+					Conference conference = new Conference(sessionId,ui,sessionName,device);
 					conference.setActiveTime(new Date());
 					conference.setStatus(ConferenceStatusType.OPENED);
 					Conference regConference = conferenceRepository.save(conference);
 					
-					ConferenceRecord conferenceRecord = new ConferenceRecord(conference,device,ConferenceOperatorType.CREATE);
+					ConferenceRecord conferenceRecord = new ConferenceRecord(regConference,device,ConferenceOperatorType.CREATE);
 					conferenceRecordRepository.save(conferenceRecord);
 				   
 				}

@@ -210,15 +210,17 @@ public class Conference implements Serializable {
 	}
 
 
-	public Conference(String sessionId,String sessionName,Device device){
+	public Conference(String sessionId,String ui, String sessionName,Device device){
     	this.sessionId = sessionId;
+    	this.ui = ui;
     	this.sessionName = sessionName;
     	this.device = device;
     }
 	
-	public Conference(String sessionId,String sessionName){
+	public Conference(String sessionId,String ui,String sessionName){
     	this.sessionId = sessionId;
     	this.sessionName = sessionName;
+    	this.ui = ui;
     }
 	
 	Conference() { // jpa only
