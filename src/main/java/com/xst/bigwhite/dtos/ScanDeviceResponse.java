@@ -27,6 +27,12 @@ public class ScanDeviceResponse {
 	 */
 	private String masternick;
 
+	/**
+	 * 是扫描二维码还是输入文字
+	 */
+	private ScanInputType scanType = ScanInputType.ScanQR;
+	
+	
 	public String getDeviceno() {
 		return deviceno;
 	}
@@ -46,6 +52,14 @@ public class ScanDeviceResponse {
 	public void setMasternick(String masternick) {
 		this.masternick = masternick;
 	}
+
+	public ScanInputType getScanType() {
+		return scanType;
+	}
+	public void setScanType(ScanInputType scanType) {
+		this.scanType = scanType;
+	}
+	
 	public static ScanDeviceResponse mapping(Device device) {
 		
 		ScanDeviceResponse response = new ScanDeviceResponse();

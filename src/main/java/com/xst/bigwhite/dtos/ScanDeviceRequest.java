@@ -5,19 +5,20 @@ package com.xst.bigwhite.dtos;
  * @author wangjun
  *
  */
-public class ScanDeviceRequest {
+public class ScanDeviceRequest extends DeviceInfoRequest {
 	
 	/**
-	 * 大白号
+	 * 是扫描二维码还是输入文字
 	 */
-    private String deviceno ;
-
-	public String getDeviceno() {
-		return deviceno;
+	private ScanInputType scanType = ScanInputType.ScanQR;
+	
+	public ScanInputType getScanType() {
+		return scanType;
 	}
 
-	public void setDeviceno(String deviceno) {
-		this.deviceno = deviceno;
+	public void setScanType(ScanInputType scanType) {
+		this.scanType = scanType;
 	}
     
+	
 }

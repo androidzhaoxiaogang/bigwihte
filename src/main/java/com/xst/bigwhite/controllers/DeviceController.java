@@ -21,15 +21,19 @@ import com.xst.bigwhite.daos.AccountDeviceRepository;
 import com.xst.bigwhite.daos.AccountRepository;
 import com.xst.bigwhite.daos.DeviceRepository;
 import com.xst.bigwhite.daos.VerifyMessageRepository;
+import com.xst.bigwhite.dtos.AccountDeviceInfo;
 import com.xst.bigwhite.dtos.ConferenceAccountRequest;
 import com.xst.bigwhite.dtos.ConferenceAccountResponse;
 import com.xst.bigwhite.dtos.ConferenceDeviceRequest;
+import com.xst.bigwhite.dtos.ConfirmAccountRequest;
 import com.xst.bigwhite.dtos.DeviceAccountInfo;
+import com.xst.bigwhite.dtos.DeviceInfoRequest;
 import com.xst.bigwhite.dtos.DeviceInfoResponse;
 import com.xst.bigwhite.dtos.RegisterDeviceRequest;
 import com.xst.bigwhite.dtos.RegisterDeviceResponse;
 import com.xst.bigwhite.dtos.ScanDeviceRequest;
 import com.xst.bigwhite.dtos.ScanDeviceResponse;
+import com.xst.bigwhite.dtos.ScanInputType;
 import com.xst.bigwhite.exception.RestRuntimeException;
 import com.xst.bigwhite.models.AccountDevice;
 import com.xst.bigwhite.models.ConferenceAccount;
@@ -111,7 +115,7 @@ public class DeviceController {
 	    		throw new RestRuntimeException("设备号:" + input.getDeviceno() + "没有注册或者不存在!");
 	    	}
 	    	
-	    	
+	    	response.setScanType(input.getScanType() == null ? ScanInputType.ScanQR : input.getScanType());
 	    	return response;
 	    }
 
@@ -151,6 +155,23 @@ public class DeviceController {
 		return response;
 	}
 	
+	
+	/**
+	 * 查询是否审核通过设备(申请的绑定到指定的设备列表 )
+	 * 
+	 * @param ConfirmAccountRequest
+	 * @return ArrayList<AccountDeviceInfo>
+	 */
+	@RequestMapping(value = "/confirms", method = RequestMethod.POST)
+	@ResponseBody
+	ArrayList<AccountDeviceInfo> confirmAccounts(@RequestBody DeviceInfoRequest input) {
+
+		ArrayList<AccountDeviceInfo> accountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
+		
+		
+		return accountDeviceInfoes;
+
+	}
 	/**
 	 * 查询当设备下所有的会议信息
 	 * 
@@ -161,6 +182,8 @@ public class DeviceController {
 	@ResponseBody
 	List<ConferenceAccountResponse> deviceConferences(@RequestBody ConferenceDeviceRequest input) {
 		List<ConferenceAccountResponse> reponses = new  ArrayList<ConferenceAccountResponse>();
+		
+		Iterable<ConferenceAccount> conferneces = getAccountConferenceByDeviceno(input.);
 		
 		return reponses;
 	}

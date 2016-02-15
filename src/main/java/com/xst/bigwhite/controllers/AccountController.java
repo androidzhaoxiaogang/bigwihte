@@ -176,6 +176,7 @@ public class AccountController {
 		 
 		 return Signer.signWithFile(fileName,id,nonce,expires);
 	}
+	
 	/**
 	 * 手机号登入
 	 * 
