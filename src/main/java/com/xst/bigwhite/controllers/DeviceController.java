@@ -165,7 +165,7 @@ public class DeviceController {
 	 */
 	@RequestMapping(value = "/confirms", method = RequestMethod.POST)
 	@ResponseBody
-	ArrayList<AccountDeviceInfo> confirmAccounts(@RequestBody ConfirmAccountRequest input) {
+	ArrayList<AccountDeviceInfo> confirmAccounts(@RequestBody DeviceInfoRequest input) {
 
 		ArrayList<AccountDeviceInfo> accountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
 		
