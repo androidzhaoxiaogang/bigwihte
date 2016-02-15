@@ -37,6 +37,7 @@ import com.xst.bigwhite.dtos.AccountInfoResponse;
 import com.xst.bigwhite.dtos.AuthorizeInfoRequest;
 import com.xst.bigwhite.dtos.ChechVerifyCodeRequest;
 import com.xst.bigwhite.dtos.ConferenceAccountRequest;
+
 import com.xst.bigwhite.dtos.ConferenceAccountResponse;
 import com.xst.bigwhite.dtos.ConfirmAccountRequest;
 import com.xst.bigwhite.dtos.RegisterMobileRequest;

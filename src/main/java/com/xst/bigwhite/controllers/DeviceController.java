@@ -1,3 +1,4 @@
+
 package com.xst.bigwhite.controllers;
 
 import java.util.ArrayList;
@@ -164,10 +165,19 @@ public class DeviceController {
 	 */
 	@RequestMapping(value = "/confirms", method = RequestMethod.POST)
 	@ResponseBody
-	ArrayList<AccountDeviceInfo> confirmAccounts(@RequestBody DeviceInfoRequest input) {
+	ArrayList<AccountDeviceInfo> confirmAccounts(@RequestBody ConfirmAccountRequest input) {
 
 		ArrayList<AccountDeviceInfo> accountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
 		
+		Iterable<AccountDevice> accounts =  getAccountByDeviceno(input.getDeviceno());
+		if (accounts != null && accounts.iterator().hasNext()) {
+			for (AccountDevice accountDeviceInfo : accounts) {
+
+				AccountDeviceInfo item = AccountDeviceInfo.mapping(accountDeviceInfo);
+				accountDeviceInfoes.add(item);
+
+			}
+		}
 		
 		return accountDeviceInfoes;
 
@@ -181,11 +191,20 @@ public class DeviceController {
 	@RequestMapping(value = "/conferences", method = RequestMethod.POST)
 	@ResponseBody
 	List<ConferenceAccountResponse> deviceConferences(@RequestBody ConferenceDeviceRequest input) {
-		List<ConferenceAccountResponse> reponses = new  ArrayList<ConferenceAccountResponse>();
+		List<ConferenceAccountResponse> response = new  ArrayList<ConferenceAccountResponse>();
 		
-		Iterable<ConferenceAccount> conferneces = getAccountConferenceByDeviceno(input.);
+		Iterable<ConferenceAccount> conferences = getAccountConferenceByDeviceno(input.deviceno);
 		
-		return reponses;
+		if (conferences!=null && conferences.iterator().hasNext()) {
+			for(ConferenceAccount conference : conferences){
+				ConferenceAccountResponse item = ConferenceAccountResponse.mapping(conference);
+				response.add(item);
+			}
+		}else{
+			throw new RestRuntimeException("设备:" + input.deviceno + "会议不存在!");
+		}
+		
+		return response;
 	}
 	
 
