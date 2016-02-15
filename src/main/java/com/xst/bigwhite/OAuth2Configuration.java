@@ -1,3 +1,4 @@
+/*
 package com.xst.bigwhite;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,3 +47,5 @@ class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
 				.secret("123456");
 	}
 }
+
+*/

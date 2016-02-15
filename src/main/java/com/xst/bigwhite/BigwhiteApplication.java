@@ -65,20 +65,19 @@ public class BigwhiteApplication {
 	private static final Logger log = LoggerFactory.getLogger(BigwhiteApplication.class);
 
 	@Configuration
-	  @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
-	  protected static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-	    @Override
-	    protected void configure(HttpSecurity http) throws Exception {
-	      http.csrf().disable()
-	        .httpBasic()
-		      .and()
-		        .authorizeRequests()
-		          //.antMatchers("/index.html", "/home.html", "/login.html", "/").permitAll()
-		          //.anyRequest().authenticated();
-		        .anyRequest().permitAll();
-	    }
-	  }
-	
+	@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+	protected static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			http.csrf().disable().authorizeRequests()
+					// .antMatchers("/index.html", "/home.html", "/login.html",
+					// "/").permitAll()
+					// .anyRequest().authenticated();
+					.anyRequest().permitAll()
+					.and().logout().logoutSuccessUrl("/").permitAll();
+					
+		}
+	}
 	
 	@Bean
     public Docket bigwhiteApi() {

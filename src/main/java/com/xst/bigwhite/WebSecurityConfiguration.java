@@ -1,3 +1,5 @@
+/*
+
 package com.xst.bigwhite;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,3 +36,5 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 								+ username + "'"));
 	}
 }
+
+*/
