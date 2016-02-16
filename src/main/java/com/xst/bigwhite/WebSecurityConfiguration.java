@@ -1,12 +1,15 @@
-/*
-
 package com.xst.bigwhite;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,26 +18,49 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.xst.bigwhite.daos.AccountRepository;
 
 @Configuration
-class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
+@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+	//@Autowired
+	//private AuthenticationManager authenticationManager;
+	
 	@Autowired
-	AccountRepository accountRepository;
-
+	private CustomUserDetailsService userDetailsService;
+	
+	
 	@Override
-	public void init(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService());
+	protected void configure(AuthenticationManagerBuilder auth)
+			throws Exception {
+	 /*auth.inMemoryAuthentication()
+			.withUser("user").password("userpwd").roles("USER")
+			.and()
+			.withUser("admin").password("adminpwd").roles("ADMIN")
+			 FIXME : check_token api validates client credentials via basic authorization 
+			.and()
+			.withUser("soncrserv").password("soncrserv").roles("CLIENT");
+		
+		auth.parentAuthenticationManager(authenticationManager);*/
+		
+		auth.userDetailsService(userDetailsService);	
 	}
-
+	
+	@Override
 	@Bean
-	UserDetailsService userDetailsService() {
-		return (username) -> accountRepository
-				.findTop1ByMobileno(username)
-				.map(a -> new User(a.username, a.password, true, true, true, true,
-						AuthorityUtils.createAuthorityList("USER", "write")))
-				.orElseThrow(
-						() -> new UsernameNotFoundException("could not find the user '"
-								+ username + "'"));
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+	
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.csrf().disable()
+			.formLogin().loginPage("/login").permitAll()
+			.and()
+				.logout().logoutSuccessUrl("/").permitAll()
+			.and()
+				.requestMatchers().antMatchers("/", "/login", "/oauth/token", "/oauth/authorize", "/oauth/confirm_access")
+			.and()
+				.authorizeRequests().anyRequest().authenticated();
+			//.and().authorizeRequests().anyRequest().permitAll();
 	}
 }
 
-*/

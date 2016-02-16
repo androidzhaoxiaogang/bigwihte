@@ -1,5 +1,7 @@
 package com.xst.bigwhite.controllers;
 
+import java.security.Principal;
+
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,11 @@ public class SampleController {
     	
         //throw new UserNotFoundException("aa");
     	return resp;
+    }
+
+    @RequestMapping("/user")
+    public Principal user(Principal user) {
+      return user;
     }
 
     /*public static void main(String[] args) throws Exception {
