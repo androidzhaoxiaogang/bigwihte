@@ -413,9 +413,65 @@ public class AccountController {
 	 * @param AccountInfoRequest
 	 * @return RegisterMobileResponse
 	 */
+	@RequestMapping(value = "/bind", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean bindDevice(@RequestBody final AccountInfoRequest input) {
+		String mobileno = input.mobileno;
+		String deviceno = input.deviceno;
+		
+		Optional<Device> deviced = deviceRepository.findTop1Byno(deviceno);
+		Optional<Account> accounted = accountRepository.findTop1ByMobileno(mobileno);
+		
+		if(!deviced.isPresent()){
+			   throw new RestRuntimeException("设备号:" + deviceno + "不存在!");
+		}
+		Device device = deviced.get();
+		
+		if (accounted.isPresent()) {
+			Account account = accounted.get();
+			Set<AccountDevice> devices = account.getDevices();
+			if (devices != null && !devices.isEmpty()) {
+				Optional<AccountDevice> accountDeviced = devices.stream().filter((ac) -> {
+					return ac.getDevice().no.equals(deviceno);
+				}).findAny();
+				if (!accountDeviced.isPresent()) {
+					saveAccountDevice(account,device);
+				}
+			}else{
+				saveAccountDevice(account,device);
+				return true;
+			}
+		}else{
+			throw new RestRuntimeException("用户:" + mobileno + "不存在!");
+		}
+		
+		return false;
+	}
+	
+	
+	private void saveAccountDevice(Account account,Device device){
+		   AccountDevice accountDevice = new AccountDevice();
+		   accountDevice.createdate = new Date();
+		   accountDevice.setDevice(device);
+		   accountDevice.setAccount(account);
+		   accountDevice.setNick(account.getUsername());
+		   accountDevice.setConfirmed(false);
+		   if(device.getDevices() ==null || device.getDevices().isEmpty()){
+			   accountDevice.setDevicemaster(true);
+		   }
+		   
+		   accountDeviceRepository.save(accountDevice);
+	}
+	
+	/**
+	 * 更新当前账户的信息 取消用户和设备的绑定关系
+	 * 
+	 * @param AccountInfoRequest
+	 * @return RegisterMobileResponse
+	 */
 	@RequestMapping(value = "/unbind", method = RequestMethod.POST)
 	@ResponseBody
-	Boolean registryMobileUnBind(@RequestBody final AccountInfoRequest input) {
+	Boolean unBindDevice(@RequestBody final AccountInfoRequest input) {
 		String mobileno = input.mobileno;
 		String deviceno = input.deviceno;
 		
