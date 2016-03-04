@@ -3,6 +3,7 @@ package com.xst.bigwhite;
 import static com.google.common.base.Predicates.or;
 import static springfox.documentation.builders.PathSelectors.regex;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.connector.Connector;
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +28,16 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
+import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -68,12 +74,39 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class BigwhiteApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(BigwhiteApplication.class);
+    
+	@Autowired
+	private HttpsProperties httpsProperties;
 
 	@Bean
 	public Docket bigwhiteApi() {
 		return new Docket(DocumentationType.SWAGGER_2).groupName("bigwhite-api").apiInfo(apiInfo()).select()
 				.paths(bigwhitePaths()).build().pathMapping("/").enableUrlTemplating(true);
 	}
+
+	/*
+	 * @Bean public EmbeddedServletContainerFactory servletContainer() {
+	 * TomcatEmbeddedServletContainerFactory tomcat = new
+	 * TomcatEmbeddedServletContainerFactory();
+	 * tomcat.addAdditionalTomcatConnectors(createSslConnector()); return
+	 * tomcat; }
+	 * 
+	 * private Connector createSslConnector() { Connector connector = new
+	 * Connector("org.apache.coyote.http11.Http11NioProtocol");
+	 * Http11NioProtocol protocol = (Http11NioProtocol)
+	 * connector.getProtocolHandler(); try { File keystore = new
+	 * ClassPathResource("keystore").getFile(); File truststore = new
+	 * ClassPathResource("keystore").getFile(); connector.setScheme("https");
+	 * connector.setSecure(true); connector.setPort(8443);
+	 * protocol.setSSLEnabled(true);
+	 * protocol.setKeystoreFile(keystore.getAbsolutePath());
+	 * protocol.setKeystorePass("changeit");
+	 * protocol.setTruststoreFile(truststore.getAbsolutePath());
+	 * protocol.setTruststorePass("changeit");
+	 * protocol.setKeyAlias("apitester"); return connector; } catch (IOException
+	 * ex) { throw new IllegalStateException("can't access keystore: [" +
+	 * "keystore" + "] or truststore: [" + "keystore" + "]", ex); } }
+	 */
 
 	@Autowired
 	private TypeResolver typeResolver;
@@ -97,7 +130,7 @@ public class BigwhiteApplication {
 	// "Authorization: Bearer 66953496-fc5b-44d0-9210-b0521863ffcb"
 	// CORS
 	@Bean
-	FilterRegistrationBean corsFilter(@Value("${tagit.origin:http://localhost:9000}") String origin) {
+	FilterRegistrationBean corsFilter(@Value("${tagit.origin:http://localhost:8080}") String origin) {
 		return new FilterRegistrationBean(new Filter() {
 			public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 					throws IOException, ServletException {
@@ -130,6 +163,14 @@ public class BigwhiteApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(BigwhiteApplication.class, args);
 
+	}
+
+	public HttpsProperties getHttpsProperties() {
+		return httpsProperties;
+	}
+
+	public void setHttpsProperties(HttpsProperties httpsProperties) {
+		this.httpsProperties = httpsProperties;
 	}
 
 }

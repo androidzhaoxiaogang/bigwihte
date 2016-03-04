@@ -12,6 +12,7 @@ import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.name.Rename;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityProperties.Headers;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.xst.bigwhite.BigwhiteApplication;
 import com.xst.bigwhite.daos.AccountDeviceRepository;
 import com.xst.bigwhite.daos.AccountRepository;
 import com.xst.bigwhite.daos.DeviceRepository;
@@ -41,7 +43,10 @@ public class FileUploadController {
 	private final AccountRepository accountRepository;
 	private final VerifyMessageRepository verifyMessageRepository;
 	private final AccountDeviceRepository accountDeviceRepository;
-	private final String uploadFolder =  "/upload";
+
+
+	@Value("${upload.dir}")
+	public String uploadDir;
 	
 	@Autowired
 	FileUploadController(AccountRepository accountRepository,
@@ -78,16 +83,17 @@ public class FileUploadController {
     	
     	 if (!file.isEmpty()) {
              try {
-                String basePath = Helpers.getPath(request, uploadFolder);
+                String basePath = uploadDir;  //Helpers.getPath(request, BigwhiteApplication.ROOT);
                 
              	File destinationDir = new File(basePath);
              	if(!destinationDir.exists()  && !destinationDir.isDirectory()){
              		destinationDir.mkdir();
              	}
-             	 
+             	
+             	
              	String filename = Helpers.getFileName() + ".jpg";
              	String fullname =  basePath + filename;
-             	String thumbnail = "thumbnail-" + filename;
+             	String thumbnail = "thumbnail-"  + filename;
              	
                  byte[] bytes = file.getBytes();
                  BufferedOutputStream stream =
@@ -96,24 +102,30 @@ public class FileUploadController {
                  stream.close();
                  
                 
-                 Thumbnails.of(filename)
+                 Thumbnails.of(fullname)
                          .size(200, 200)
                          .toFiles(destinationDir, Rename.PREFIX_HYPHEN_THUMBNAIL);
                  
-                 Picture picture = new Picture(uploadFolder + filename, destinationDir + filename);
+                 
+                 String urlThumbnail = "/upload/" + thumbnail;
+                 String urlImage = "/upload/" + filename;
+                 
+                 Picture picture = new Picture(urlImage,urlThumbnail);
                  pictureRepository.save(picture);
                  
                  Optional<Account> accouted = accountRepository.findTop1ByMobileno(mobileno);
                  if(accouted.isPresent()){
                 	 Account account = accouted.get();
-                	 account.headimage = uploadFolder + thumbnail;
+                	 account.headimage = urlThumbnail;
                 	 accountRepository.save(account);
                 	 
                  }else{
                 	 throw new RestRuntimeException ("图片上传失败! 手机号:" + mobileno + " 不存在! ");
                  }
                  
-                 return Helpers.getBasePath(request, uploadFolder);
+                 String url = Helpers.getBasePath(request, urlThumbnail);
+          
+                 return url;
              } catch (Exception e) {
                  throw new RestRuntimeException ("图片上传失败! 手机号:" + mobileno + " => " + e.getMessage());
              }
@@ -137,7 +149,7 @@ public class FileUploadController {
     	
     	 if (!file.isEmpty()) {
              try {
-                String basePath = Helpers.getPath(request, uploadFolder);
+                String basePath =  uploadDir;// Helpers.getPath(request, BigwhiteApplication.ROOT);
                 
              	File destinationDir = new File(basePath);
              	if(!destinationDir.exists()  && !destinationDir.isDirectory()){
@@ -145,7 +157,7 @@ public class FileUploadController {
              	}
              	 
              	String filename = Helpers.getFileName() + ".jpg";
-             	String fullname =  basePath + filename;
+             	String fullname =  basePath +  filename;
              	String thumbnail = "thumbnail-" + filename;
              	
                  byte[] bytes = file.getBytes();
@@ -155,24 +167,26 @@ public class FileUploadController {
                  stream.close();
                  
                 
-                 Thumbnails.of(filename)
+                 Thumbnails.of(fullname)
                          .size(200, 200)
                          .toFiles(destinationDir, Rename.PREFIX_HYPHEN_THUMBNAIL);
                  
-                 Picture picture = new Picture(uploadFolder + filename, destinationDir + filename);
+                 String urlThumbnail = "/upload/" + thumbnail;
+                 String urlImage = "/upload/" + filename;
+                 Picture picture = new Picture(urlImage, urlThumbnail);
                  pictureRepository.save(picture);
                  
                  Optional<Device> deviced = deviceRepository.findTop1Byno(deviceno);
                  if(deviced.isPresent()){
                 	 Device device = deviced.get();
-                	 device.headimage = uploadFolder + thumbnail;
+                	 device.headimage = urlThumbnail;
                 	 deviceRepository.save(device);
                 	 
                  }else{
                 	 throw new RestRuntimeException ("上传图片失败!设备号:" + deviceno + " 不存在! ");
                  }
                  
-                 return Helpers.getBasePath(request, uploadFolder);
+                 return Helpers.getBasePath(request, urlThumbnail);
              } catch (Exception e) {
                  throw new RestRuntimeException ("上传图片失败!设备号:" + deviceno + " => " + e.getMessage());
              }
