@@ -394,6 +394,7 @@ public class AccountController {
 					accountDevice.setAccount(account);
 					accountDevice.setCreatedate(new Date());
 					accountDevice.setNick(input.getUsername());
+					
 	
 					Device device = deviced.get();
 					if (device.getAccount() == null) {
@@ -401,6 +402,7 @@ public class AccountController {
 						deviceadmin = true;
 						device.setAccount(accountUpdated);
 						accountDevice.setConfirmed(true);
+						accountDevice.setDeviceNick(device.name);
 						
 						deviceRepository.save(device);
 					}
@@ -468,6 +470,7 @@ public class AccountController {
 		   accountDevice.setDevice(device);
 		   accountDevice.setAccount(account);
 		   accountDevice.setNick(account.getUsername());
+		   accountDevice.setDeviceNick(device.name);
 		   accountDevice.setConfirmed(false);
 		   if(device.getDevices() ==null || device.getDevices().isEmpty()){
 			   accountDevice.setDevicemaster(true);
