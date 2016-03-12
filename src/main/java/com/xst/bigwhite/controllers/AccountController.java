@@ -131,22 +131,11 @@ public class AccountController {
 			}else{
 				if(input.deviceno!=null && input.nick!=null){
 					Iterable<AccountDevice> devices = getAccountDevice(input.mobileno,input.deviceno);
-					
-					ArrayList<AccountDeviceInfo> AccountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
-					
-					devices.forEach((d)->{
-						
-						AccountDeviceInfo accountDeviceInfo = AccountDeviceInfo.mapping(d);
-						
-						if (d.getDevice() == null) {
-							accountDeviceInfo.setDevicemaster(false);
-						} else {
-							accountDeviceInfo.setDevicemaster(d.getDevice().no == input.getDeviceno() && d.devicemaster);
-						}
-						
-						AccountDeviceInfoes.add(accountDeviceInfo);
-						
-					});
+					if(devices!=null && devices.iterator().hasNext()){
+						AccountDevice device = devices.iterator().next();
+						device.setNick(input.nick);
+						accountDeviceRepository.save(device);
+					}
 				}
 			}
 			
@@ -157,6 +146,30 @@ public class AccountController {
 		return true;
 	}
 
+	/**
+	 * 修改账户的昵称
+	 * @param AccountInfoRequest
+	 * @return AccountInfoResponse
+	 */
+	@RequestMapping(value = "/updateDeviceNick", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean updateDeviceNick(@RequestBody AccountInfoRequest input) {
+	    if(input.mobileno ==null|| input.deviceno== null || input.devicenick==null){
+	    	Iterable<AccountDevice> devices = getAccountDevice(input.mobileno,input.deviceno);
+	    	if(devices!=null && devices.iterator().hasNext()){
+	    		AccountDevice device = devices.iterator().next();
+	    		device.setDeviceNick(input.devicenick);
+				accountDeviceRepository.save(device);
+	    	}else{
+	    		throw new RestRuntimeException("没有查到账户" + input.mobileno + "设备号" + input.deviceno + "已经绑定的信息！");
+	    	}
+	    }else{
+	    	throw new RestRuntimeException("用户名或者设备号和设备昵称不能为空！");
+	    }
+		
+	    return true;
+	}
+	
 	
 	@Value("${justalk.prikey}")
 	String fileName;

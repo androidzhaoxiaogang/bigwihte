@@ -29,6 +29,12 @@ public class DeviceAccountInfo {
 	 */
 	public String headImage;
 	
+	/**
+	 * 设备昵称
+	 */
+	public String deviceNick;
+	
+	
 	  /**
      * 是否是设备管理员
      */
@@ -58,6 +64,13 @@ public class DeviceAccountInfo {
 		this.nick = nick;
 	}
 
+	public String getDeviceNick() {
+		return deviceNick;
+	}
+
+	public void setDeviceNick(String deviceNick) {
+		this.deviceNick = deviceNick;
+	}
 
 	public String getHeadImage() {
 		return headImage;
@@ -82,6 +95,7 @@ public class DeviceAccountInfo {
 		accountInfo.setDevicemaster(ac.getDevicemaster());
     	accountInfo.setMobileno(ac.getAccount().mobileno);
     	accountInfo.setNick(ac.nick);
+    	accountInfo.setDeviceNick(ac.getDeviceNick());
     	accountInfo.setUsername(ac.getAccount().getUsername());
     	accountInfo.setHeadImage(ac.getAccount().headimage);
     	

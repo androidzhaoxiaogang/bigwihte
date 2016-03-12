@@ -16,9 +16,14 @@ public class AccountInfoResponse {
 	public String mobileno;
 	
 	/**
-	 * 用户名或者昵称
+	 * 用户名
 	 */
 	public String username;
+	
+	/**
+	 * 昵称
+	 */
+	public String nick;
 	
 	/**
 	 * 用户头像
@@ -55,6 +60,14 @@ public class AccountInfoResponse {
 		this.username = username;
 	}
 
+	public String getNick() {
+		return nick;
+	}
+
+	public void setNick(String nick) {
+		this.nick = nick;
+	}
+
 	public List<AccountDeviceInfo> getDevices() {
 		return devices;
 	}
@@ -63,6 +76,4 @@ public class AccountInfoResponse {
 		this.devices = devices;
 	}
 
-
-	
 }

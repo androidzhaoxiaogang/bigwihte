@@ -24,15 +24,33 @@ public class AccountDeviceInfo {
 	 */
 	public String devicename;
 	
+	
+	/**
+	 * 设备昵称
+	 */
+	public String devicenick;
+	
+	
+	/**
+	 * 用户名
+	 */
+	public String username;
+	
     /**
-     * 昵称
+     * 用户昵称
      */
 	public String nick;
 	
+	
+	/**
+	 * 用户头像
+	 */
+    public String headimage;
+    
 	/**
 	 * 设备头像
 	 */
-    public String headimage;
+    public String deviceheadimage;
     
 	/**
      * 是否是设备管理员
@@ -85,6 +103,32 @@ public class AccountDeviceInfo {
 		this.nick = nick;
 	}
 
+	
+	public String getDevicenick() {
+		return devicenick;
+	}
+
+	public void setDevicenick(String devicenick) {
+		this.devicenick = devicenick;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	
+	public String getDeviceheadimage() {
+		return deviceheadimage;
+	}
+
+	public void setDeviceheadimage(String deviceheadimage) {
+		this.deviceheadimage = deviceheadimage;
+	}
+
 	public Boolean getDevicemaster() {
 		return devicemaster;
 	}
@@ -108,11 +152,13 @@ public class AccountDeviceInfo {
 
 		deviceInfo.setDevicename(acdevice.getDevice().name);
 		deviceInfo.setDeviceno(acdevice.getDevice().no);
-		deviceInfo.setNick(acdevice.nick);
+		deviceInfo.setDeviceheadimage(acdevice.getDevice().getHeadimage());
+		deviceInfo.setDevicenick(acdevice.getDeviceNick());
 		
 		deviceInfo.setHeadimage(acdevice.getAccount().headimage);
 		deviceInfo.setMobileno(acdevice.getAccount().getMobileno());
-		
+		deviceInfo.setNick(acdevice.getNick());
+
 		deviceInfo.setDevicemaster(acdevice.getDevicemaster());
 		deviceInfo.setConfirmed(acdevice.getConfirmed());
 		return deviceInfo;

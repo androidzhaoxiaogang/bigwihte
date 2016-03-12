@@ -19,6 +19,11 @@ public class AccountInfoRequest extends AccountInfo {
     public String deviceno ;
     
    
+    /**
+     * 设备昵称
+     */
+    public String devicenick;
+    
 	public String getPassword() {
 		return password;
 	}
@@ -36,6 +41,13 @@ public class AccountInfoRequest extends AccountInfo {
 		this.deviceno = deviceno;
 	}
 
+	public String getDevicenick() {
+		return devicenick;
+	}
+
+	public void setDevicenick(String devicenick) {
+		this.devicenick = devicenick;
+	}
 
 
 }

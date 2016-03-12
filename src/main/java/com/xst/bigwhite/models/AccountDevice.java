@@ -44,10 +44,15 @@ public class AccountDevice implements Serializable {
 	private Device device;
 	
 	/**
-	 * 用户当前设备的昵称
+	 * 用户所属当前设备的昵称
 	 * 备注名称
 	 */
 	public String nick;
+	
+	/**
+	 * 设备备注
+	 */
+	public String deviceNick;
 	
 	/**
 	 * 账户加入当前设备的验证码
@@ -105,6 +110,15 @@ public class AccountDevice implements Serializable {
 
 	public void setNick(String nick) {
 		this.nick = nick;
+	}
+
+	
+	public String getDeviceNick() {
+		return deviceNick;
+	}
+
+	public void setDeviceNick(String deviceNick) {
+		this.deviceNick = deviceNick;
 	}
 
 	public Boolean getDevicemaster() {
