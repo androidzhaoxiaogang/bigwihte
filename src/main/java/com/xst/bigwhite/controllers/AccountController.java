@@ -124,19 +124,19 @@ public class AccountController {
 		Optional<Account> accounted = accountRepository.findTop1ByMobileno(input.mobileno);
 		if (accounted.isPresent()) {
 			Account account = accounted.get();
-			if(!account.username.equals(input.username))
+			
+			if(input.deviceno!=null && input.nick!=null){
+				Iterable<AccountDevice> devices = getAccountDevice(input.mobileno,input.deviceno);
+				if(devices!=null && devices.iterator().hasNext()){
+					AccountDevice device = devices.iterator().next();
+					device.setNick(input.nick);
+					accountDeviceRepository.save(device);
+				}
+			}
+			else if(input.username!=null && !account.username.equals(input.username))
 			{
 				account.setUsername(input.username);
 				accountRepository.save(account);
-			}else{
-				if(input.deviceno!=null && input.nick!=null){
-					Iterable<AccountDevice> devices = getAccountDevice(input.mobileno,input.deviceno);
-					if(devices!=null && devices.iterator().hasNext()){
-						AccountDevice device = devices.iterator().next();
-						device.setNick(input.nick);
-						accountDeviceRepository.save(device);
-					}
-				}
 			}
 			
 		} else {
@@ -154,7 +154,7 @@ public class AccountController {
 	@RequestMapping(value = "/updateDeviceNick", method = RequestMethod.POST)
 	@ResponseBody
 	Boolean updateDeviceNick(@RequestBody AccountInfoRequest input) {
-	    if(input.mobileno ==null|| input.deviceno== null || input.devicenick==null){
+	    if(input.getMobileno() != null && input.getDeviceno()!= null && input.getDevicenick() !=null){
 	    	Iterable<AccountDevice> devices = getAccountDevice(input.mobileno,input.deviceno);
 	    	if(devices!=null && devices.iterator().hasNext()){
 	    		AccountDevice device = devices.iterator().next();

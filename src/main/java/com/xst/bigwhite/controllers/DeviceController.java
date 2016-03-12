@@ -136,8 +136,8 @@ public class DeviceController {
 		Optional<Device> deviced = deviceRepository.findTop1Byno(input.getDeviceno());
 		if (deviced.isPresent()) {
 			Device device = deviced.get();
-			if (!device.name.equals(input.deviceName)) {
-				device.name = input.deviceName;
+			if (!device.name.equals(input.devicename)) {
+				device.name = input.devicename;
 				deviceRepository.save(device);
 			} 
 		} else {
