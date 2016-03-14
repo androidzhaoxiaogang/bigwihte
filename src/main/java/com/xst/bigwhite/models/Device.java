@@ -75,12 +75,27 @@ public class Device implements Serializable {
     private Set<AccountLogin> logins = new HashSet<>();
 	
 	/**
-	 * 设备的登入历史信息
+	 * 设备的备注信息
 	 */
 	@OneToMany(mappedBy = "device")
 	@JsonIgnore
     private Set<AccountNote> notes = new HashSet<>();
 	
+	/**
+	 * 设备的绑定信息
+	 */
+	@OneToMany(mappedBy = "device")
+	@JsonIgnore
+    private Set<DeviceBind> binds = new HashSet<>();
+	
+	/**
+	 * 设备的绑定信息
+	 */
+	@OneToMany(mappedBy = "binded")
+	@JsonIgnore
+    private Set<DeviceBind> bindsTo = new HashSet<>();
+	
+
 	/**
 	 * 用户参与的会议 
 	 *
@@ -177,6 +192,27 @@ public class Device implements Serializable {
 
 	public void setNotes(Set<AccountNote> notes) {
 		this.notes = notes;
+	}
+
+
+	
+	public Set<DeviceBind> getBinds() {
+		return binds;
+	}
+
+
+	public void setBinds(Set<DeviceBind> binds) {
+		this.binds = binds;
+	}
+
+
+	public Set<DeviceBind> getBindsTo() {
+		return bindsTo;
+	}
+
+
+	public void setBindsTo(Set<DeviceBind> bindsTo) {
+		this.bindsTo = bindsTo;
 	}
 
 
