@@ -16,18 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.expr.BooleanExpression;
 import com.xst.bigwhite.daos.AccountDeviceRepository;
 import com.xst.bigwhite.daos.AccountRepository;
 import com.xst.bigwhite.daos.DeviceRepository;
 import com.xst.bigwhite.daos.VerifyMessageRepository;
 import com.xst.bigwhite.dtos.AccountDeviceInfo;
 import com.xst.bigwhite.dtos.AccountInfoRequest;
-import com.xst.bigwhite.dtos.ConferenceAccountRequest;
 import com.xst.bigwhite.dtos.ConferenceAccountResponse;
 import com.xst.bigwhite.dtos.ConferenceDeviceRequest;
-import com.xst.bigwhite.dtos.ConfirmAccountRequest;
 import com.xst.bigwhite.dtos.DeviceAccountInfo;
 import com.xst.bigwhite.dtos.DeviceInfoRequest;
 import com.xst.bigwhite.dtos.DeviceInfoResponse;
@@ -38,17 +34,11 @@ import com.xst.bigwhite.dtos.ScanDeviceResponse;
 import com.xst.bigwhite.dtos.ScanInputType;
 import com.xst.bigwhite.dtos.UpdateDeviceInfoRequest;
 import com.xst.bigwhite.exception.RestRuntimeException;
-import com.xst.bigwhite.models.Account;
 import com.xst.bigwhite.models.AccountDevice;
 import com.xst.bigwhite.models.ConferenceAccount;
 import com.xst.bigwhite.models.Device;
-import com.xst.bigwhite.models.QAccount;
-import com.xst.bigwhite.models.QAccountDevice;
-import com.xst.bigwhite.models.QConference;
-import com.xst.bigwhite.models.QConferenceAccount;
-import com.xst.bigwhite.models.QDevice;
+import com.xst.bigwhite.service.AccountDeviceService;
 import com.xst.bigwhite.utils.Helpers;
-import com.xst.bigwhite.utils.RepositoryHelper;
 
 @Controller
 @EnableAutoConfiguration
@@ -59,16 +49,20 @@ public class DeviceController {
 	private final AccountRepository accountRepository;
 	private final VerifyMessageRepository verifyMessageRepository;
 	private final AccountDeviceRepository accountDeviceRepository;
+	private final AccountDeviceService accountDeviceService;
 
 	@Autowired
 	DeviceController(AccountRepository accountRepository, 
 			DeviceRepository deviceRepository,
 			VerifyMessageRepository verifyMessageRepository, 
-			AccountDeviceRepository accountDeviceRepository) {
+			AccountDeviceRepository accountDeviceRepository,
+			AccountDeviceService accountDeviceService) {
+		
 		this.deviceRepository = deviceRepository;
 		this.accountRepository = accountRepository;
 		this.verifyMessageRepository = verifyMessageRepository;
 		this.accountDeviceRepository = accountDeviceRepository;
+		this.accountDeviceService = accountDeviceService;
 	}
 	
 	@PersistenceContext
@@ -168,9 +162,9 @@ public class DeviceController {
 			throw new RestRuntimeException("设备名称或用户名不能未空!");
 		}
 		
-		Iterable<AccountDevice> accountDeviced = RepositoryHelper.getAccountDevice(entityManager,input.mobileno,input.deviceno);
+		Iterable<AccountDevice> accountDeviced = accountDeviceService.getAccountDevice(input.mobileno,input.deviceno);
 		if(accountDeviced.iterator().hasNext()){
-		  Iterable<AccountDevice> masterAccounted = RepositoryHelper.getAccountDeviceMasterByDeviceNo(entityManager,input.deviceno); 
+		  Iterable<AccountDevice> masterAccounted = accountDeviceService.getAccountDeviceMasterByDeviceNo(input.deviceno); 
 		  if(masterAccounted.iterator().hasNext()){
 			  AccountDevice masterAccount = masterAccounted.iterator().next();
 			  masterAccount.setDevicemaster(false);
@@ -206,7 +200,7 @@ public class DeviceController {
 			response.setDevicename(device.getName());
 			response.setDeviceno(deviceno);
 
-			Iterable<AccountDevice> accountList = RepositoryHelper.getAccountByDeviceno(entityManager,deviceno);
+			Iterable<AccountDevice> accountList = accountDeviceService.getAccountByDeviceno(deviceno);
 
 			List<DeviceAccountInfo> accounts = new ArrayList<>();
 			response.setAccounts(accounts);
@@ -237,7 +231,7 @@ public class DeviceController {
 
 		ArrayList<AccountDeviceInfo> accountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
 
-		Iterable<AccountDevice> accounts = RepositoryHelper.getAccountByDeviceno(entityManager,input.getDeviceno());
+		Iterable<AccountDevice> accounts = accountDeviceService.getAccountByDeviceno(input.getDeviceno());
 		if (accounts != null && accounts.iterator().hasNext()) {
 			for (AccountDevice accountDeviceInfo : accounts) {
 
@@ -262,7 +256,7 @@ public class DeviceController {
 	List<ConferenceAccountResponse> deviceConferences(@RequestBody ConferenceDeviceRequest input) {
 		List<ConferenceAccountResponse> response = new ArrayList<ConferenceAccountResponse>();
 
-		Iterable<ConferenceAccount> conferences = RepositoryHelper.getAccountConferenceByDeviceno(entityManager,input.deviceno);
+		Iterable<ConferenceAccount> conferences = accountDeviceService.getAccountConferenceByDeviceno(input.deviceno);
 
 		if (conferences != null && conferences.iterator().hasNext()) {
 			for (ConferenceAccount conference : conferences) {

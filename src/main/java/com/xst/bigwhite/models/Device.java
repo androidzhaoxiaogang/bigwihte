@@ -75,6 +75,13 @@ public class Device implements Serializable {
     private Set<AccountLogin> logins = new HashSet<>();
 	
 	/**
+	 * 设备的登入历史信息
+	 */
+	@OneToMany(mappedBy = "device")
+	@JsonIgnore
+    private Set<AccountNote> notes = new HashSet<>();
+	
+	/**
 	 * 用户参与的会议 
 	 *
 	 */
@@ -160,6 +167,16 @@ public class Device implements Serializable {
 
 	public void setLogins(Set<AccountLogin> logins) {
 		this.logins = logins;
+	}
+
+	
+	public Set<AccountNote> getNotes() {
+		return notes;
+	}
+
+
+	public void setNotes(Set<AccountNote> notes) {
+		this.notes = notes;
 	}
 
 

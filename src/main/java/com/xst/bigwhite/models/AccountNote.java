@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,7 +21,7 @@ public class AccountNote  implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 8735320741500649511L;
+	private static final long serialVersionUID = 8635320741500649511L;
 
 	/**
 	 * JPA 主键
@@ -45,6 +46,13 @@ public class AccountNote  implements Serializable {
 	@JsonIgnore
 	@ManyToOne
 	private Account contact;
+	
+	/**
+	 * 帐号的设备
+	 */
+	@JsonIgnore
+	@ManyToOne
+	private Device device;
 	
 	/**
 	 * 联系人名称
@@ -87,6 +95,16 @@ public class AccountNote  implements Serializable {
 	}
 
 
+	public Device getDevice() {
+		return device;
+	}
+
+
+	public void setDevice(Device device) {
+		this.device = device;
+	}
+
+
 	public String getNoteName() {
 		return noteName;
 	}
@@ -107,9 +125,10 @@ public class AccountNote  implements Serializable {
 	}
 
 
-	public AccountNote(Account account, Account contact) {
+	public AccountNote(Account account, Account contact,Device device) {
 		this.account = account;
 		this.contact = contact;
+		this.device = device;
 	}
 
 	

@@ -1,9 +1,7 @@
 package com.xst.bigwhite.controllers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -11,11 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
-import org.hibernate.event.spi.SaveOrUpdateEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +21,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.expr.BooleanExpression;
 import com.xst.bigwhite.BigwhiteApplication;
 import com.xst.bigwhite.daos.*;
 import com.xst.bigwhite.dtos.AccountDeviceInfo;
 import com.xst.bigwhite.dtos.AccountInfoRequest;
 import com.xst.bigwhite.dtos.AccountInfoResponse;
+import com.xst.bigwhite.dtos.AccountNoteSetRequest;
+import com.xst.bigwhite.dtos.AccoutContractResponse;
 import com.xst.bigwhite.dtos.AuthorizeInfoRequest;
 import com.xst.bigwhite.dtos.ChechVerifyCodeRequest;
 import com.xst.bigwhite.dtos.ConferenceAccountRequest;
@@ -45,43 +39,50 @@ import com.xst.bigwhite.dtos.RegisterMobileResponse;
 import com.xst.bigwhite.exception.RestRuntimeException;
 import com.xst.bigwhite.models.Account;
 import com.xst.bigwhite.models.AccountDevice;
+import com.xst.bigwhite.models.AccountNote;
 import com.xst.bigwhite.models.ConferenceAccount;
 import com.xst.bigwhite.models.Device;
-import com.xst.bigwhite.models.QAccount;
-import com.xst.bigwhite.models.QAccountDevice;
-import com.xst.bigwhite.models.QConference;
-import com.xst.bigwhite.models.QConferenceAccount;
-import com.xst.bigwhite.models.QDevice;
 import com.xst.bigwhite.models.VerifyMessage;
+import com.xst.bigwhite.service.AccountDeviceService;
+import com.xst.bigwhite.service.AccountNoteService;
 import com.xst.bigwhite.utils.Helpers;
-import com.xst.bigwhite.utils.RepositoryHelper;
 import com.xst.bigwhite.utils.SMSManager;
 import com.justalk.cloud.Signer;
+import com.mysema.query.Tuple;
 
 @Controller
 @EnableAutoConfiguration
 @RequestMapping("/api/account")
 public class AccountController {
-
+	private static final Logger log = LoggerFactory.getLogger(BigwhiteApplication.class);
+	
 	private final DeviceRepository deviceRepository;
 	private final AccountRepository accountRepository;
 	private final VerifyMessageRepository verifyMessageRepository;
 	private final AccountDeviceRepository accountDeviceRepository;
-	private static final Logger log = LoggerFactory.getLogger(BigwhiteApplication.class);
+	private final AccountNoteRepository accountNoteRepository;
+	private final AccountNoteService accountNoteService;
+	private final AccountDeviceService accountDeviceService;
 
 	@Autowired
 	AccountController(AccountRepository accountRepository,
 			DeviceRepository deviceRepository,
 			VerifyMessageRepository verifyMessageRepository,
-			AccountDeviceRepository accountDeviceRepository) {
+			AccountDeviceRepository accountDeviceRepository,
+			AccountNoteRepository accountNoteRepository,
+			AccountNoteService accountNoteService,
+			AccountDeviceService accountDeviceService) {
+		
 		this.deviceRepository = deviceRepository;
 		this.accountRepository = accountRepository;
 		this.verifyMessageRepository = verifyMessageRepository;
 		this.accountDeviceRepository = accountDeviceRepository;
+		this.accountNoteRepository = accountNoteRepository;
+		
+		this.accountNoteService = accountNoteService;
+		this.accountDeviceService = accountDeviceService;
 	}
 
-	@PersistenceContext
-    private EntityManager entityManager;
 
 	@Autowired
 	SMSManager smsManager;
@@ -127,7 +128,7 @@ public class AccountController {
 			Account account = accounted.get();
 			
 			if(input.deviceno!=null && input.nick!=null){
-				Iterable<AccountDevice> devices = RepositoryHelper.getAccountDevice(entityManager,input.mobileno,input.deviceno);
+				Iterable<AccountDevice> devices = accountDeviceService.getAccountDevice(input.mobileno,input.deviceno);
 				if(devices!=null && devices.iterator().hasNext()){
 					AccountDevice device = devices.iterator().next();
 					device.setNick(input.nick);
@@ -146,6 +147,54 @@ public class AccountController {
 
 		return true;
 	}
+	
+	/**
+	 * 修改账户的联系人备注名
+	 * @param AccountInfoRequest
+	 * @return Boolean
+	 */
+	@RequestMapping(value = "/setNoteName", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean setNoteName(@RequestBody AccountNoteSetRequest input) {
+	   AccountNote accountNode =null;
+	   if(StringUtils.isBlank(input.notename)){
+		   throw new RestRuntimeException("备注名信息不能为空！");
+	   }
+	   
+	   Iterable<AccountNote> accountNotes = accountNoteService.findAccountNoteByMobileno(input.mobileno,input.deviceno,input.note_mobileno);
+	   if(accountNotes!=null && accountNotes.iterator().hasNext()){
+		   for(AccountNote note: accountNotes){
+			   if(note.getContact().mobileno.equals(input.note_mobileno)){
+				   accountNode = (AccountNote) accountNotes.iterator().next(); 
+				   break;
+			   }
+		   }
+	   }else{
+		   Optional<Account> accounted= accountRepository.findTop1ByMobileno(input.mobileno);
+		   if(!accounted.isPresent()){
+			   throw new RestRuntimeException("没有查到账户" + input.mobileno +"的信息！");
+		   }
+			   
+		   Optional<Account> noteAccounted= accountRepository.findTop1ByMobileno(input.note_mobileno);
+		   if(!noteAccounted.isPresent()){
+			   throw new RestRuntimeException("没有查到备注账户" + input.note_mobileno +"的信息！");
+		   }
+		   
+		   Optional<Device> deviced = deviceRepository.findTop1Byno(input.deviceno);
+		   if(!deviced.isPresent()){
+			   throw new RestRuntimeException("没有查到备注设备" + input.deviceno +"的信息！");
+		   }
+		   
+		   accountNode = new AccountNote(accounted.get(),noteAccounted.get(),deviced.get());
+	   }
+	   
+	   if(accountNode!=null){
+		   accountNode.setNoteName(input.notename);
+		   accountNoteRepository.save(accountNode);
+	   }
+	   
+	   return true;
+	}
 
 	/**
 	 * 修改账户的昵称
@@ -156,7 +205,7 @@ public class AccountController {
 	@ResponseBody
 	Boolean updateDeviceNick(@RequestBody AccountInfoRequest input) {
 	    if(input.getMobileno() != null && input.getDeviceno()!= null && input.getDevicenick() !=null){
-	    	Iterable<AccountDevice> devices = RepositoryHelper.getAccountDevice(entityManager,input.mobileno,input.deviceno);
+	    	Iterable<AccountDevice> devices = accountDeviceService.getAccountDevice(input.mobileno,input.deviceno);
 	    	if(devices!=null && devices.iterator().hasNext()){
 	    		AccountDevice device = devices.iterator().next();
 	    		device.setDeviceNick(input.devicenick);
@@ -401,7 +450,7 @@ public class AccountController {
 			Optional<Device> deviced = deviceRepository.findTop1Byno(input.getDeviceno());
 			if (deviced.isPresent()) {
 				AccountDevice accountDevice = null;
-				Iterable<AccountDevice> accountDevices = RepositoryHelper.getAccountDevice(entityManager,mobileno,deviceno);
+				Iterable<AccountDevice> accountDevices = accountDeviceService.getAccountDevice(mobileno,deviceno);
 				if(accountDevices.iterator().hasNext()){
 					accountDevice = accountDevices.iterator().next();
 				}
@@ -570,7 +619,7 @@ public class AccountController {
 	    String deviceno = input.deviceno;
 	    
 		AccountDevice accountDevice = null;
-		Iterable<AccountDevice> accountDevices = RepositoryHelper.getAccountDevice(entityManager,mobileno,deviceno);
+		Iterable<AccountDevice> accountDevices = accountDeviceService.getAccountDevice(mobileno,deviceno);
 		if(accountDevices.iterator().hasNext()){
 			accountDevice = accountDevices.iterator().next();
 			accountDevice.confirmed = true;
@@ -596,7 +645,7 @@ public class AccountController {
 
 		ArrayList<AccountDeviceInfo> accountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
 
-		Iterable<AccountDevice> deviceInfoes = RepositoryHelper.getAccountDeviceByAccountMobile(entityManager,input.mobileno);
+		Iterable<AccountDevice> deviceInfoes = accountDeviceService.getAccountDeviceByAccountMobile(input.mobileno);
 		if (deviceInfoes != null && deviceInfoes.iterator().hasNext()) {
 			for (AccountDevice accountDevice : deviceInfoes) {
 				AccountDeviceInfo item = AccountDeviceInfo.mapping(accountDevice);
@@ -621,12 +670,12 @@ public class AccountController {
 
 		ArrayList<AccountDeviceInfo> accountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
 
-		Iterable<AccountDevice> deviceInfoes = RepositoryHelper.getAccountDeviceByAccountMobile(entityManager,input.mobileno);
+		Iterable<AccountDevice> deviceInfoes = accountDeviceService.getAccountDeviceByAccountMobile(input.mobileno);
 		if (deviceInfoes != null && deviceInfoes.iterator().hasNext()) {
 			for (AccountDevice accountDevice : deviceInfoes) {
 				if (accountDevice.getAccount() != null && accountDevice.getDevice() != null) {
 
-					Iterable<AccountDevice> devices = RepositoryHelper.getAccountDeviceByDeviceno(entityManager,accountDevice.getDevice().no);
+					Iterable<AccountDevice> devices = accountDeviceService.getAccountDeviceByDeviceno(accountDevice.getDevice().no);
 					if (devices != null && devices.iterator().hasNext()) {
 						for (AccountDevice accountDeviceInfo : devices) {
 
@@ -642,6 +691,36 @@ public class AccountController {
 		return accountDeviceInfoes;
 	}
 	
+	 /* 查询当前账户下所有的会议信息
+	 * 
+	 * @param ConferenceAccountResponse
+	 * @return ArrayList<ConferenceAccountResponse>
+	 */
+	@RequestMapping(value = "/contacts", method = RequestMethod.POST)
+	@ResponseBody
+	List<AccoutContractResponse> contactAccounts(@RequestBody AccountInfoRequest input) {
+		List<AccoutContractResponse>  response = new ArrayList<AccoutContractResponse>();
+		
+		Iterable<AccountNote> accountNotes = accountNoteService.getAccountNotesByAccountMobileAndDevice(input.mobileno,input.deviceno);
+		if (accountNotes!=null && accountNotes.iterator().hasNext()) {
+			for(AccountNote accountNote :  accountNotes){
+				AccoutContractResponse accountContractResponse = new AccoutContractResponse();
+				
+				accountContractResponse.setHeadimage(accountNote.getAccount().headimage);
+				accountContractResponse.setMobileno(accountNote.getAccount().mobileno);
+				accountContractResponse.setUsername(accountNote.getAccount().username);
+				accountContractResponse.setNoteName(accountNote.getAccount().username);
+				
+				if(StringUtils.isNotBlank(accountNote.noteName)){
+					accountContractResponse.setNoteName(accountNote.noteName);
+				}
+				
+				response.add(accountContractResponse);
+			}
+		}
+		
+		return response;
+	 }
 	
 	/*private void validateUser(String username, String mobileno) {
 		this.accountRepository.findByUsernameOrMobileno(username, mobileno)
@@ -659,7 +738,7 @@ public class AccountController {
 	List<ConferenceAccountResponse> conferenceAccounts(@RequestBody ConferenceAccountRequest input) {
 		List<ConferenceAccountResponse>  response = new ArrayList<ConferenceAccountResponse>();
 		
-		Iterable<ConferenceAccount> conferences = RepositoryHelper.getAccountConferenceByAccountMobile(entityManager,input.mobileno);
+		Iterable<ConferenceAccount> conferences = accountDeviceService.getAccountConferenceByAccountMobile(input.mobileno);
 		if (conferences!=null && conferences.iterator().hasNext()) {
 			for(ConferenceAccount conference : conferences){
 				ConferenceAccountResponse item = ConferenceAccountResponse.mapping(conference);

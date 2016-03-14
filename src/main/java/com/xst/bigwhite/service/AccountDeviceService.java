@@ -1,7 +1,9 @@
-package com.xst.bigwhite.utils;
+package com.xst.bigwhite.service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import org.springframework.stereotype.Service;
 
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.expr.BooleanExpression;
@@ -13,9 +15,13 @@ import com.xst.bigwhite.models.QConference;
 import com.xst.bigwhite.models.QConferenceAccount;
 import com.xst.bigwhite.models.QDevice;
 
-public class RepositoryHelper {
+@Service("accountDeviceService")
+public class AccountDeviceService {
 
-	public static Iterable<ConferenceAccount> getAccountConferenceByDeviceno(EntityManager entityManager,String no) {
+	@PersistenceContext
+    private EntityManager entityManager;
+
+	public Iterable<ConferenceAccount> getAccountConferenceByDeviceno(String no) {
 		QConferenceAccount qConferenceAccount = QConferenceAccount.conferenceAccount;
 		QAccount qAccount = QAccount.account;
 		QConference qConference = QConference.conference;
@@ -25,14 +31,16 @@ public class RepositoryHelper {
 		JPAQuery query = new JPAQuery(entityManager);
 		Iterable<ConferenceAccount> accountdevices = query.from(qConferenceAccount)
 				.leftJoin(qConferenceAccount.account, qAccount).fetch()
-				.leftJoin(qConferenceAccount.conference, qConference).fetch().leftJoin(qConference.device, qDevice)
-				.fetch().where(device).list(qConferenceAccount);
+				.leftJoin(qConferenceAccount.conference, qConference).fetch()
+				.leftJoin(qConference.device, qDevice).fetch()
+				.where(device)
+				.list(qConferenceAccount);
 
 		return accountdevices;
 	}
 
 	
-	public static Iterable<AccountDevice> getAccountByDeviceno(EntityManager entityManager,String deviceno) {
+	public Iterable<AccountDevice> getAccountByDeviceno(String deviceno) {
 		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
 		QDevice qDevice = QDevice.device;
 		QAccount qAccount = QAccount.account;
@@ -41,14 +49,17 @@ public class RepositoryHelper {
 		// accountDeviceRepository.findAll(bDeviceno);
 
 		JPAQuery query = new JPAQuery(entityManager);
-		Iterable<AccountDevice> accountdevices = query.from(qAccountDevice).leftJoin(qAccountDevice.account, qAccount)
-				.fetch().leftJoin(qAccountDevice.device, qDevice).fetch().where(bDeviceno).list(qAccountDevice);
+		Iterable<AccountDevice> accountdevices = query.from(qAccountDevice)
+				.leftJoin(qAccountDevice.account, qAccount).fetch()
+				.leftJoin(qAccountDevice.device, qDevice).fetch()
+				.where(bDeviceno)
+				.list(qAccountDevice);
 
 		return accountdevices;
 	}
 	
 	
-	public static Iterable<AccountDevice> getAccountDeviceMaster(EntityManager entityManager, String deviceno) {
+	public Iterable<AccountDevice> getAccountDeviceMaster(String deviceno) {
 		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
 		QAccount qAccount = QAccount.account;
 		QDevice qDevice = QDevice.device;
@@ -65,7 +76,7 @@ public class RepositoryHelper {
 		return accountdevices;
 	}
 	
-	public static Iterable<AccountDevice> getAccountDevice(EntityManager entityManager,String mobileno , String deviceno) {
+	public Iterable<AccountDevice> getAccountDevice(String mobileno , String deviceno) {
 		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
 		QAccount qAccount = QAccount.account;
 		QDevice qDevice = QDevice.device;
@@ -102,7 +113,7 @@ public class RepositoryHelper {
 		return accountdevices;
 	}*/
 	
-	public static Iterable<AccountDevice> getAccountDeviceByDeviceno(EntityManager entityManager,String no) {
+	public Iterable<AccountDevice> getAccountDeviceByDeviceno(String no) {
 		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
 		QAccount qAccount = QAccount.account;
 		QDevice qDevice = QDevice.device;
@@ -120,7 +131,7 @@ public class RepositoryHelper {
 	}
 
 	
-	public static Iterable<AccountDevice> getAccountDeviceByAccountMobile(EntityManager entityManager,String mobileno) {
+	public Iterable<AccountDevice> getAccountDeviceByAccountMobile(String mobileno) {
 		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
 		QAccount qAccount = QAccount.account;
 		QDevice qDevice = QDevice.device;
@@ -137,7 +148,7 @@ public class RepositoryHelper {
 		return accountdevices;
 	}
 
-	public static Iterable<AccountDevice> getAccountDeviceMasterByDeviceNo(EntityManager entityManager,String deviceno) {
+	public Iterable<AccountDevice> getAccountDeviceMasterByDeviceNo(String deviceno) {
 		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
 		QAccount qAccount = QAccount.account;
 		QDevice qDevice = QDevice.device;
@@ -154,7 +165,7 @@ public class RepositoryHelper {
 		return accountdevices;
 	}
 
-	public static Iterable<ConferenceAccount> getAccountConferenceByAccountMobile(EntityManager entityManager,String mobileno) {
+	public Iterable<ConferenceAccount> getAccountConferenceByAccountMobile(String mobileno) {
 		QConferenceAccount qConferenceAccount = QConferenceAccount.conferenceAccount;
 		QAccount qAccount = QAccount.account;
 		QConference qConference = QConference.conference;
