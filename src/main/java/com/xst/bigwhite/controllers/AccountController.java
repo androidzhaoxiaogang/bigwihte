@@ -54,6 +54,7 @@ import com.xst.bigwhite.models.QConferenceAccount;
 import com.xst.bigwhite.models.QDevice;
 import com.xst.bigwhite.models.VerifyMessage;
 import com.xst.bigwhite.utils.Helpers;
+import com.xst.bigwhite.utils.RepositoryHelper;
 import com.xst.bigwhite.utils.SMSManager;
 import com.justalk.cloud.Signer;
 
@@ -126,7 +127,7 @@ public class AccountController {
 			Account account = accounted.get();
 			
 			if(input.deviceno!=null && input.nick!=null){
-				Iterable<AccountDevice> devices = getAccountDevice(input.mobileno,input.deviceno);
+				Iterable<AccountDevice> devices = RepositoryHelper.getAccountDevice(entityManager,input.mobileno,input.deviceno);
 				if(devices!=null && devices.iterator().hasNext()){
 					AccountDevice device = devices.iterator().next();
 					device.setNick(input.nick);
@@ -155,7 +156,7 @@ public class AccountController {
 	@ResponseBody
 	Boolean updateDeviceNick(@RequestBody AccountInfoRequest input) {
 	    if(input.getMobileno() != null && input.getDeviceno()!= null && input.getDevicenick() !=null){
-	    	Iterable<AccountDevice> devices = getAccountDevice(input.mobileno,input.deviceno);
+	    	Iterable<AccountDevice> devices = RepositoryHelper.getAccountDevice(entityManager,input.mobileno,input.deviceno);
 	    	if(devices!=null && devices.iterator().hasNext()){
 	    		AccountDevice device = devices.iterator().next();
 	    		device.setDeviceNick(input.devicenick);
@@ -400,7 +401,7 @@ public class AccountController {
 			Optional<Device> deviced = deviceRepository.findTop1Byno(input.getDeviceno());
 			if (deviced.isPresent()) {
 				AccountDevice accountDevice = null;
-				Iterable<AccountDevice> accountDevices = getAccountDevice(mobileno,deviceno);
+				Iterable<AccountDevice> accountDevices = RepositoryHelper.getAccountDevice(entityManager,mobileno,deviceno);
 				if(accountDevices.iterator().hasNext()){
 					accountDevice = accountDevices.iterator().next();
 				}
@@ -569,7 +570,7 @@ public class AccountController {
 	    String deviceno = input.deviceno;
 	    
 		AccountDevice accountDevice = null;
-		Iterable<AccountDevice> accountDevices = getAccountDevice(mobileno,deviceno);
+		Iterable<AccountDevice> accountDevices = RepositoryHelper.getAccountDevice(entityManager,mobileno,deviceno);
 		if(accountDevices.iterator().hasNext()){
 			accountDevice = accountDevices.iterator().next();
 			accountDevice.confirmed = true;
@@ -595,7 +596,7 @@ public class AccountController {
 
 		ArrayList<AccountDeviceInfo> accountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
 
-		Iterable<AccountDevice> deviceInfoes = getAccountDeviceByAccountMobile(input.mobileno);
+		Iterable<AccountDevice> deviceInfoes = RepositoryHelper.getAccountDeviceByAccountMobile(entityManager,input.mobileno);
 		if (deviceInfoes != null && deviceInfoes.iterator().hasNext()) {
 			for (AccountDevice accountDevice : deviceInfoes) {
 				AccountDeviceInfo item = AccountDeviceInfo.mapping(accountDevice);
@@ -607,23 +608,6 @@ public class AccountController {
 	}
 	
 	
-	
-	private Iterable<AccountDevice> getAccountDeviceByAccountMobile(String mobileno) {
-		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
-		QAccount qAccount = QAccount.account;
-		QDevice qDevice = QDevice.device;
-		
-		BooleanExpression account = qAccount.mobileno.eq(mobileno);
-
-		JPAQuery query = new JPAQuery(entityManager);
-		Iterable<AccountDevice> accountdevices = query.from(qAccountDevice)
-			 .leftJoin(qAccountDevice.account,qAccount).fetch()
-			 .leftJoin(qAccountDevice.device,qDevice).fetch()
-			 .where(account)
-			 .list(qAccountDevice);
-	
-		return accountdevices;
-	}
 
 	/**
 	 * 查询是否审核通过设备(申请的绑定到指定的设备列表 )
@@ -637,12 +621,12 @@ public class AccountController {
 
 		ArrayList<AccountDeviceInfo> accountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
 
-		Iterable<AccountDevice> deviceInfoes = getAccountDeviceByMaster(input.mobileno);
+		Iterable<AccountDevice> deviceInfoes = RepositoryHelper.getAccountDeviceByAccountMobile(entityManager,input.mobileno);
 		if (deviceInfoes != null && deviceInfoes.iterator().hasNext()) {
 			for (AccountDevice accountDevice : deviceInfoes) {
 				if (accountDevice.getAccount() != null && accountDevice.getDevice() != null) {
 
-					Iterable<AccountDevice> devices = getAccountDeviceByDeviceno(accountDevice.getDevice().no);
+					Iterable<AccountDevice> devices = RepositoryHelper.getAccountDeviceByDeviceno(entityManager,accountDevice.getDevice().no);
 					if (devices != null && devices.iterator().hasNext()) {
 						for (AccountDevice accountDeviceInfo : devices) {
 
@@ -658,59 +642,7 @@ public class AccountController {
 		return accountDeviceInfoes;
 	}
 	
-	private Iterable<AccountDevice> getAccountDeviceByDeviceno(String no) {
-		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
-		QAccount qAccount = QAccount.account;
-		QDevice qDevice = QDevice.device;
-		
-		BooleanExpression device = qDevice.no.eq(no);
-
-		JPAQuery query = new JPAQuery(entityManager);
-		Iterable<AccountDevice> accountdevices = query.from(qAccountDevice)
-			 .leftJoin(qAccountDevice.account,qAccount).fetch()
-			 .leftJoin(qAccountDevice.device,qDevice).fetch()
-			 .where(device)
-			 .list(qAccountDevice);
 	
-		return accountdevices;
-	}
-
-	private Iterable<AccountDevice> getAccountDeviceByMaster(String mobileno) {
-		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
-		QAccount qAccount = QAccount.account;
-		QDevice qDevice = QDevice.device;
-		
-		BooleanExpression accountMobile = qAccount.mobileno.eq(mobileno);
-
-		JPAQuery query = new JPAQuery(entityManager);
-		Iterable<AccountDevice> accountdevices = query.from(qAccountDevice)
-			 .leftJoin(qAccountDevice.account,qAccount).fetch()
-			 .leftJoin(qAccountDevice.device,qDevice).fetch()
-			 .where(accountMobile.and(qAccountDevice.devicemaster.eq(true)))
-			 .list(qAccountDevice);
-	
-		return accountdevices;
-	}
-
-	
-	private Iterable<AccountDevice> getAccountDevice(String mobileno , String deviceno) {
-		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
-		QAccount qAccount = QAccount.account;
-		QDevice qDevice = QDevice.device;
-		
-		BooleanExpression accountMobile = qAccount.mobileno.eq(mobileno);
-		BooleanExpression deviceMobile = qDevice.no.eq(deviceno);
-
-		JPAQuery query = new JPAQuery(entityManager);
-		Iterable<AccountDevice> accountdevices = query.from(qAccountDevice)
-			 .leftJoin(qAccountDevice.account,qAccount).fetch()
-			 .leftJoin(qAccountDevice.device,qDevice).fetch()
-			 .where(accountMobile.and(deviceMobile))
-			 .list(qAccountDevice);
-	
-		return accountdevices;
-	}
-
 	/*private void validateUser(String username, String mobileno) {
 		this.accountRepository.findByUsernameOrMobileno(username, mobileno)
 				.orElseThrow(() -> new RestRuntimeException("用户:" + username + "/" + mobileno + "不存在!"));
@@ -727,7 +659,7 @@ public class AccountController {
 	List<ConferenceAccountResponse> conferenceAccounts(@RequestBody ConferenceAccountRequest input) {
 		List<ConferenceAccountResponse>  response = new ArrayList<ConferenceAccountResponse>();
 		
-		Iterable<ConferenceAccount> conferences = getAccountConferenceByAccountMobile(input.mobileno);
+		Iterable<ConferenceAccount> conferences = RepositoryHelper.getAccountConferenceByAccountMobile(entityManager,input.mobileno);
 		if (conferences!=null && conferences.iterator().hasNext()) {
 			for(ConferenceAccount conference : conferences){
 				ConferenceAccountResponse item = ConferenceAccountResponse.mapping(conference);
@@ -739,27 +671,6 @@ public class AccountController {
 		
 		return response;
 	}
-	
-	
-	private Iterable<ConferenceAccount> getAccountConferenceByAccountMobile(String mobileno) {
-		QConferenceAccount qConferenceAccount = QConferenceAccount.conferenceAccount;
-		QAccount qAccount = QAccount.account;
-		QConference qConference = QConference.conference;
-		QDevice qDevice = QDevice.device;
-		
-		BooleanExpression account = qAccount.mobileno.eq(mobileno);
-
-		JPAQuery query = new JPAQuery(entityManager);
-		Iterable<ConferenceAccount> accountdevices = query.from(qConferenceAccount)
-			 .leftJoin(qConferenceAccount.account,qAccount).fetch()
-			 .leftJoin(qConferenceAccount.conference,qConference).fetch()
-			 .leftJoin(qConference.device,qDevice).fetch()
-			 .where(account)
-			 .list(qConferenceAccount);
-	
-		return accountdevices;
-	}
-
 	
 }
 

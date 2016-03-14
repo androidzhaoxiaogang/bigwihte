@@ -13,5 +13,5 @@ import com.xst.bigwhite.models.AccountDevice;
 @Repository
 public interface AccountDeviceRepository extends JpaRepository<AccountDevice, Long>, 
 												 QueryDslPredicateExecutor<AccountDevice> {
-	Optional<AccountDevice> findTop1ByDevicemaster(Boolean devicemaster);
+
 }

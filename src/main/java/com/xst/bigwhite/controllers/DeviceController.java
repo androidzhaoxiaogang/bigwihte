@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.expr.BooleanExpression;
-import com.mysql.jdbc.StringUtils;
 import com.xst.bigwhite.daos.AccountDeviceRepository;
 import com.xst.bigwhite.daos.AccountRepository;
 import com.xst.bigwhite.daos.DeviceRepository;
@@ -49,6 +48,7 @@ import com.xst.bigwhite.models.QConference;
 import com.xst.bigwhite.models.QConferenceAccount;
 import com.xst.bigwhite.models.QDevice;
 import com.xst.bigwhite.utils.Helpers;
+import com.xst.bigwhite.utils.RepositoryHelper;
 
 @Controller
 @EnableAutoConfiguration
@@ -70,6 +70,10 @@ public class DeviceController {
 		this.verifyMessageRepository = verifyMessageRepository;
 		this.accountDeviceRepository = accountDeviceRepository;
 	}
+	
+	@PersistenceContext
+	private EntityManager entityManager;
+
 
 	/**
 	 * 注册设备
@@ -160,15 +164,15 @@ public class DeviceController {
 	@RequestMapping(value = "/setMaster", method = RequestMethod.POST)
 	@ResponseBody
 	Boolean setMaster(@RequestBody final AccountInfoRequest input) {
-		if(StringUtils.isNullOrEmpty(input.mobileno) || StringUtils.isNullOrEmpty(input.deviceno) ){
+		if(input.mobileno==null || input.deviceno==null){
 			throw new RestRuntimeException("设备名称或用户名不能未空!");
 		}
 		
-		Iterable<AccountDevice> accountDeviced = getAccountDevice(input.mobileno,input.deviceno);
+		Iterable<AccountDevice> accountDeviced = RepositoryHelper.getAccountDevice(entityManager,input.mobileno,input.deviceno);
 		if(accountDeviced.iterator().hasNext()){
-		  Optional<AccountDevice> masterAccounted = accountDeviceRepository.findTop1ByDevicemaster(true); 
-		  if(masterAccounted.isPresent()){
-			  AccountDevice masterAccount = masterAccounted.get();
+		  Iterable<AccountDevice> masterAccounted = RepositoryHelper.getAccountDeviceMasterByDeviceNo(entityManager,input.deviceno); 
+		  if(masterAccounted.iterator().hasNext()){
+			  AccountDevice masterAccount = masterAccounted.iterator().next();
 			  masterAccount.setDevicemaster(false);
 			  accountDeviceRepository.save(masterAccount);
 		  }
@@ -202,7 +206,7 @@ public class DeviceController {
 			response.setDevicename(device.getName());
 			response.setDeviceno(deviceno);
 
-			Iterable<AccountDevice> accountList = getAccountByDeviceno(deviceno);
+			Iterable<AccountDevice> accountList = RepositoryHelper.getAccountByDeviceno(entityManager,deviceno);
 
 			List<DeviceAccountInfo> accounts = new ArrayList<>();
 			response.setAccounts(accounts);
@@ -233,7 +237,7 @@ public class DeviceController {
 
 		ArrayList<AccountDeviceInfo> accountDeviceInfoes = new ArrayList<AccountDeviceInfo>();
 
-		Iterable<AccountDevice> accounts = getAccountByDeviceno(input.getDeviceno());
+		Iterable<AccountDevice> accounts = RepositoryHelper.getAccountByDeviceno(entityManager,input.getDeviceno());
 		if (accounts != null && accounts.iterator().hasNext()) {
 			for (AccountDevice accountDeviceInfo : accounts) {
 
@@ -258,7 +262,7 @@ public class DeviceController {
 	List<ConferenceAccountResponse> deviceConferences(@RequestBody ConferenceDeviceRequest input) {
 		List<ConferenceAccountResponse> response = new ArrayList<ConferenceAccountResponse>();
 
-		Iterable<ConferenceAccount> conferences = getAccountConferenceByDeviceno(input.deviceno);
+		Iterable<ConferenceAccount> conferences = RepositoryHelper.getAccountConferenceByDeviceno(entityManager,input.deviceno);
 
 		if (conferences != null && conferences.iterator().hasNext()) {
 			for (ConferenceAccount conference : conferences) {
@@ -272,57 +276,5 @@ public class DeviceController {
 		return response;
 	}
 
-	private Iterable<ConferenceAccount> getAccountConferenceByDeviceno(String no) {
-		QConferenceAccount qConferenceAccount = QConferenceAccount.conferenceAccount;
-		QAccount qAccount = QAccount.account;
-		QConference qConference = QConference.conference;
-		QDevice qDevice = QDevice.device;
-		BooleanExpression device = qDevice.no.eq(no);
-
-		JPAQuery query = new JPAQuery(entityManager);
-		Iterable<ConferenceAccount> accountdevices = query.from(qConferenceAccount)
-				.leftJoin(qConferenceAccount.account, qAccount).fetch()
-				.leftJoin(qConferenceAccount.conference, qConference).fetch().leftJoin(qConference.device, qDevice)
-				.fetch().where(device).list(qConferenceAccount);
-
-		return accountdevices;
-	}
-
-	@PersistenceContext
-	private EntityManager entityManager;
-
-	private Iterable<AccountDevice> getAccountByDeviceno(String deviceno) {
-		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
-		QDevice qDevice = QDevice.device;
-		QAccount qAccount = QAccount.account;
-		BooleanExpression bDeviceno = qDevice.no.eq(deviceno);
-		// Iterable<AccountDevice> accountList =
-		// accountDeviceRepository.findAll(bDeviceno);
-
-		JPAQuery query = new JPAQuery(entityManager);
-		Iterable<AccountDevice> accountdevices = query.from(qAccountDevice).leftJoin(qAccountDevice.account, qAccount)
-				.fetch().leftJoin(qAccountDevice.device, qDevice).fetch().where(bDeviceno).list(qAccountDevice);
-
-		return accountdevices;
-	}
 	
-	
-	private Iterable<AccountDevice> getAccountDevice(String mobileno , String deviceno) {
-		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
-		QAccount qAccount = QAccount.account;
-		QDevice qDevice = QDevice.device;
-		
-		BooleanExpression accountMobile = qAccount.mobileno.eq(mobileno);
-		BooleanExpression deviceMobile = qDevice.no.eq(deviceno);
-
-		JPAQuery query = new JPAQuery(entityManager);
-		Iterable<AccountDevice> accountdevices = query.from(qAccountDevice)
-			 .leftJoin(qAccountDevice.account,qAccount).fetch()
-			 .leftJoin(qAccountDevice.device,qDevice).fetch()
-			 .where(accountMobile.and(deviceMobile))
-			 .list(qAccountDevice);
-	
-		return accountdevices;
-	}
-
 }
