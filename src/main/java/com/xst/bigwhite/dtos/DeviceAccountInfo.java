@@ -34,6 +34,15 @@ public class DeviceAccountInfo {
 	 */
 	public String deviceNick;
 	
+	/**
+	 * 备注名称
+	 */
+	public String noteName;
+	
+	/**
+	 * 设备号
+	 */
+	public String deviceNo;
 	
 	  /**
      * 是否是设备管理员
@@ -72,6 +81,15 @@ public class DeviceAccountInfo {
 		this.deviceNick = deviceNick;
 	}
 
+	
+	public String getNoteName() {
+		return noteName;
+	}
+
+	public void setNoteName(String noteName) {
+		this.noteName = noteName;
+	}
+
 	public String getHeadImage() {
 		return headImage;
 	}
@@ -88,6 +106,15 @@ public class DeviceAccountInfo {
 		this.devicemaster = devicemaster;
 	}
 
+	
+	public String getDeviceNo() {
+		return deviceNo;
+	}
+
+	public void setDeviceNo(String deviceNo) {
+		this.deviceNo = deviceNo;
+	}
+
 	public static DeviceAccountInfo mapping(AccountDevice ac) {
 		
 		DeviceAccountInfo accountInfo = new DeviceAccountInfo();
@@ -95,6 +122,8 @@ public class DeviceAccountInfo {
 		accountInfo.setDevicemaster(ac.getDevicemaster());
     	accountInfo.setMobileno(ac.getAccount().mobileno);
     	accountInfo.setNick(ac.nick);
+    	accountInfo.setDeviceNo(ac.getDevice().no);
+    	
     	accountInfo.setDeviceNick(ac.getDeviceNick());
     	accountInfo.setUsername(ac.getAccount().getUsername());
     	accountInfo.setHeadImage(ac.getAccount().headimage);

@@ -14,6 +14,7 @@ import com.xst.bigwhite.models.QAccountDevice;
 import com.xst.bigwhite.models.QConference;
 import com.xst.bigwhite.models.QConferenceAccount;
 import com.xst.bigwhite.models.QDevice;
+import com.xst.bigwhite.models.QDeviceNote;
 
 @Service("accountDeviceService")
 public class AccountDeviceService {
@@ -43,6 +44,7 @@ public class AccountDeviceService {
 	public Iterable<AccountDevice> getAccountByDeviceno(String deviceno) {
 		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
 		QDevice qDevice = QDevice.device;
+		QDeviceNote qDeviceNote = QDeviceNote.deviceNote;
 		QAccount qAccount = QAccount.account;
 		BooleanExpression bDeviceno = qDevice.no.eq(deviceno);
 		// Iterable<AccountDevice> accountList =

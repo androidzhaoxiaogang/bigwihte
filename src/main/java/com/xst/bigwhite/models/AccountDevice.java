@@ -43,6 +43,7 @@ public class AccountDevice implements Serializable {
 	@ManyToOne
 	private Device device;
 	
+
 	/**
 	 * 用户所属当前设备的昵称
 	 * 备注名称
@@ -103,6 +104,7 @@ public class AccountDevice implements Serializable {
 	public void setDevice(Device device) {
 		this.device = device;
 	}
+
 
 	public String getNick() {
 		return nick;

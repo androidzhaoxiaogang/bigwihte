@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Controller;
@@ -18,15 +19,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.xst.bigwhite.daos.AccountDeviceRepository;
 import com.xst.bigwhite.daos.AccountRepository;
+import com.xst.bigwhite.daos.DeviceNoteRepository;
 import com.xst.bigwhite.daos.DeviceRepository;
 import com.xst.bigwhite.daos.VerifyMessageRepository;
 import com.xst.bigwhite.dtos.AccountDeviceInfo;
 import com.xst.bigwhite.dtos.AccountInfoRequest;
+import com.xst.bigwhite.dtos.AccountNoteSetRequest;
 import com.xst.bigwhite.dtos.ConferenceAccountResponse;
 import com.xst.bigwhite.dtos.ConferenceDeviceRequest;
 import com.xst.bigwhite.dtos.DeviceAccountInfo;
 import com.xst.bigwhite.dtos.DeviceInfoRequest;
 import com.xst.bigwhite.dtos.DeviceInfoResponse;
+import com.xst.bigwhite.dtos.DeviceSetNoteInfoRequest;
 import com.xst.bigwhite.dtos.RegisterDeviceRequest;
 import com.xst.bigwhite.dtos.RegisterDeviceResponse;
 import com.xst.bigwhite.dtos.ScanDeviceRequest;
@@ -34,10 +38,13 @@ import com.xst.bigwhite.dtos.ScanDeviceResponse;
 import com.xst.bigwhite.dtos.ScanInputType;
 import com.xst.bigwhite.dtos.UpdateDeviceInfoRequest;
 import com.xst.bigwhite.exception.RestRuntimeException;
+import com.xst.bigwhite.models.Account;
 import com.xst.bigwhite.models.AccountDevice;
 import com.xst.bigwhite.models.ConferenceAccount;
 import com.xst.bigwhite.models.Device;
+import com.xst.bigwhite.models.DeviceNote;
 import com.xst.bigwhite.service.AccountDeviceService;
+import com.xst.bigwhite.service.DeviceNoteService;
 import com.xst.bigwhite.utils.Helpers;
 
 @Controller
@@ -49,20 +56,29 @@ public class DeviceController {
 	private final AccountRepository accountRepository;
 	private final VerifyMessageRepository verifyMessageRepository;
 	private final AccountDeviceRepository accountDeviceRepository;
+	private final DeviceNoteRepository deviceNoteRepository;
+	
 	private final AccountDeviceService accountDeviceService;
+	private final DeviceNoteService deviceNoteService;
+	
 
 	@Autowired
 	DeviceController(AccountRepository accountRepository, 
 			DeviceRepository deviceRepository,
 			VerifyMessageRepository verifyMessageRepository, 
 			AccountDeviceRepository accountDeviceRepository,
-			AccountDeviceService accountDeviceService) {
+			DeviceNoteRepository deviceNoteRepository,
+			AccountDeviceService accountDeviceService,
+			DeviceNoteService deviceNoteService) {
 		
 		this.deviceRepository = deviceRepository;
 		this.accountRepository = accountRepository;
 		this.verifyMessageRepository = verifyMessageRepository;
 		this.accountDeviceRepository = accountDeviceRepository;
+		this.deviceNoteRepository = deviceNoteRepository;
+		
 		this.accountDeviceService = accountDeviceService;
+		this.deviceNoteService = deviceNoteService;
 	}
 	
 	@PersistenceContext
@@ -150,6 +166,46 @@ public class DeviceController {
 	}
 
 	/**
+	 * 修改账户的联系人备注名
+	 * @param AccountInfoRequest
+	 * @return Boolean
+	 */
+	@RequestMapping(value = "/setAcountNoteName", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean setAcountNoteName(@RequestBody DeviceSetNoteInfoRequest input) {
+		
+		DeviceNote deviceNote =null;
+		
+		if(!StringUtils.isNotBlank(input.noteName)){
+			throw new RestRuntimeException("设备备注名称不能为空!");
+		}
+		
+		Iterable<DeviceNote> deviceNotes = deviceNoteService.findAcountNoteByDeviceAndMobile(input.getDeviceno(),input.mobileno);
+		if(deviceNotes!=null && deviceNotes.iterator().hasNext()){
+			deviceNote = deviceNotes.iterator().next();
+		}else{
+			Optional<Account> accounted = accountRepository.findTop1ByMobileno(input.mobileno);
+			if(!accounted.isPresent()){
+				throw new RestRuntimeException("账户:" + input.mobileno + "不存在!");
+			}
+			
+			Optional<Device> deviced = deviceRepository.findTop1Byno(input.getDeviceno());
+			if(!deviced.isPresent()){
+				throw new RestRuntimeException("设备:" + input.getDeviceno() + "不存在!");
+			}
+			
+			deviceNote = new DeviceNote(accounted.get(),deviced.get());
+		}
+		
+		if(deviceNote!=null){
+			deviceNote.setNoteName(input.noteName);
+			deviceNoteRepository.save(deviceNote);
+		}
+		
+		return true;
+	}
+
+	/**
 	 * 更新大白管理元
 	 * 
 	 * @param AccountInfoRequest
@@ -211,6 +267,11 @@ public class DeviceController {
 				accounts.add(accountInfo);
 				// }
 			});
+			
+			Iterable<DeviceNote> deviceNotes = deviceNoteService.findAcountNoteByDevice(input.getDeviceno());
+			if(deviceNotes!=null && deviceNotes.iterator().hasNext()){
+				updateDeviceNoteName(deviceNotes,accounts);
+			}
 
 		} else {
 			throw new RestRuntimeException("设备号:" + input.getDeviceno() + "没有注册或者不存在!");
@@ -218,6 +279,18 @@ public class DeviceController {
 
 		return response;
 	}
+
+	private void updateDeviceNoteName(Iterable<DeviceNote> deviceNotes, List<DeviceAccountInfo> accounts) {
+		deviceNotes.forEach((dn)->{
+			String mobileno = dn.getAccount().mobileno;
+			accounts.forEach((ac)->{
+				if(ac.mobileno.equals(mobileno)){
+					ac.setNoteName(dn.getNoteName());
+				}
+			});
+		});
+	}
+
 
 	/**
 	 * 查询是否审核通过设备(申请的绑定到指定的设备列表 )

@@ -153,9 +153,9 @@ public class AccountController {
 	 * @param AccountInfoRequest
 	 * @return Boolean
 	 */
-	@RequestMapping(value = "/setNoteName", method = RequestMethod.POST)
+	@RequestMapping(value = "/setAcountNoteName", method = RequestMethod.POST)
 	@ResponseBody
-	Boolean setNoteName(@RequestBody AccountNoteSetRequest input) {
+	Boolean setAcountNoteName(@RequestBody AccountNoteSetRequest input) {
 	   AccountNote accountNode =null;
 	   if(StringUtils.isBlank(input.notename)){
 		   throw new RestRuntimeException("备注名信息不能为空！");
