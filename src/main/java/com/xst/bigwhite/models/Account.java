@@ -37,7 +37,18 @@ public class Account implements Serializable  {
 	@OneToMany(mappedBy = "account")
     private Set<AccountDevice> devices = new HashSet<>();
 
-
+	/**
+	 * 用户的备注信息
+	 */
+	@OneToMany(mappedBy = "account")
+    private Set<AccountNote> notes = new HashSet<>();
+	
+	/**
+	 * 用户的联系人信息
+	 */
+	@OneToMany(mappedBy = "contact")
+    private Set<AccountNote> contracts = new HashSet<>();
+	
 	/**
 	 * 用户的登入历史信息
 	 */
@@ -125,6 +136,22 @@ public class Account implements Serializable  {
 
 	public void setLogins(Set<AccountLogin> logins) {
 		this.logins = logins;
+	}
+
+	public Set<AccountNote> getNotes() {
+		return notes;
+	}
+
+	public void setNotes(Set<AccountNote> notes) {
+		this.notes = notes;
+	}
+
+	public Set<AccountNote> getContracts() {
+		return contracts;
+	}
+
+	public void setContracts(Set<AccountNote> contracts) {
+		this.contracts = contracts;
 	}
 
 	public Long getId() {
