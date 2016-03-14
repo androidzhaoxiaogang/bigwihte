@@ -241,6 +241,22 @@ public class AccountController {
 
 		return response;
 	}
+	
+
+	/**
+	 * 注册手机号码
+	 * 
+	 * @param RegisterMobileRequest
+	 * @return RegisterMobileResponse
+	 */
+	@RequestMapping(value = "/checkRegistry", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean checkRegistry(@RequestBody RegisterMobileRequest input) {
+		RegisterMobileResponse response = new RegisterMobileResponse();
+		Optional<Account> accountd = accountRepository.findTop1ByMobileno(input.mobileno);
+		
+		return accountd.isPresent();
+	}
 
 	/**
 	 * 注册手机号码
@@ -421,7 +437,9 @@ public class AccountController {
 		}
 
 	}
+	
 
+	
 	/**
 	 * 更新当前账户的信息 取消用户和设备的绑定关系
 	 * 

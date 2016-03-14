@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.Size;
@@ -20,6 +22,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 public class VerifyMessage implements Serializable  {
 
+	/**
+	 * 验证码类型
+	 *
+	 */
+	public enum VerifyCodeType{
+		UserRegistry,
+		ChangeManager
+	}
+	
 	/**
 	 * 
 	 */
@@ -57,6 +68,12 @@ public class VerifyMessage implements Serializable  {
 	 * 是否已验证
 	 */
 	public Boolean used = new Boolean(false);
+	
+	/**
+	 * 验证码类型
+	 */
+	@Enumerated(EnumType.STRING)
+	public VerifyCodeType codeType = VerifyCodeType.UserRegistry;
 
 	public Long getId() {
 		return id;
@@ -98,6 +115,16 @@ public class VerifyMessage implements Serializable  {
 		this.used = used;
 	}
 	
+	
+	
+	public VerifyCodeType getCodeType() {
+		return codeType;
+	}
+
+	public void setCodeType(VerifyCodeType codeType) {
+		this.codeType = codeType;
+	}
+
 	public VerifyMessage(String mobileno,String verifycode){
 		this.mobileno = mobileno;
 		this.verifycode = verifycode;

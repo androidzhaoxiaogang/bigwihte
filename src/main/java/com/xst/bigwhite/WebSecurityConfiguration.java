@@ -56,11 +56,11 @@ class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.formLogin().loginPage("/login").permitAll()
 			.and()
 				.logout().logoutSuccessUrl("/").permitAll()
+			//.and()
+				//.requestMatchers().antMatchers("/", "/login", "/oauth/token", "/oauth/authorize", "/oauth/confirm_access","")
 			.and()
-				.requestMatchers().antMatchers("/", "/login", "/oauth/token", "/oauth/authorize", "/oauth/confirm_access")
-			.and()
-				.authorizeRequests().anyRequest().authenticated();
-			//.and().authorizeRequests().anyRequest().permitAll();
+				//.authorizeRequests().anyRequest().authenticated();
+			     .authorizeRequests().anyRequest().permitAll();
 	}
 }
 

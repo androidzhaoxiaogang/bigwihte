@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.expr.BooleanExpression;
+import com.mysql.jdbc.StringUtils;
 import com.xst.bigwhite.daos.AccountDeviceRepository;
 import com.xst.bigwhite.daos.AccountRepository;
 import com.xst.bigwhite.daos.DeviceRepository;
@@ -60,8 +61,10 @@ public class DeviceController {
 	private final AccountDeviceRepository accountDeviceRepository;
 
 	@Autowired
-	DeviceController(AccountRepository accountRepository, DeviceRepository deviceRepository,
-			VerifyMessageRepository verifyMessageRepository, AccountDeviceRepository accountDeviceRepository) {
+	DeviceController(AccountRepository accountRepository, 
+			DeviceRepository deviceRepository,
+			VerifyMessageRepository verifyMessageRepository, 
+			AccountDeviceRepository accountDeviceRepository) {
 		this.deviceRepository = deviceRepository;
 		this.accountRepository = accountRepository;
 		this.verifyMessageRepository = verifyMessageRepository;
@@ -99,6 +102,7 @@ public class DeviceController {
 
 		return response;
 	}
+	
 
 	/**
 	 * 扫描二维码查询设备信息
@@ -147,6 +151,39 @@ public class DeviceController {
 		return true;
 	}
 
+	/**
+	 * 更新大白管理元
+	 * 
+	 * @param AccountInfoRequest
+	 * @return Boolean
+	 */
+	@RequestMapping(value = "/setMaster", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean setMaster(@RequestBody final AccountInfoRequest input) {
+		if(StringUtils.isNullOrEmpty(input.mobileno) || StringUtils.isNullOrEmpty(input.deviceno) ){
+			throw new RestRuntimeException("设备名称或用户名不能未空!");
+		}
+		
+		Iterable<AccountDevice> accountDeviced = getAccountDevice(input.mobileno,input.deviceno);
+		if(accountDeviced.iterator().hasNext()){
+		  Optional<AccountDevice> masterAccounted = accountDeviceRepository.findTop1ByDevicemaster(true); 
+		  if(masterAccounted.isPresent()){
+			  AccountDevice masterAccount = masterAccounted.get();
+			  masterAccount.setDevicemaster(false);
+			  accountDeviceRepository.save(masterAccount);
+		  }
+			
+		  AccountDevice accountDevice = accountDeviced.iterator().next();
+		  accountDevice.setDevicemaster(true);
+		  accountDeviceRepository.save(accountDevice);
+		}else{
+			throw new RestRuntimeException("设备名称" + input.getDeviceno() + "用户名" + input.mobileno + "没有绑定!");
+		}
+		
+		return true;
+	}
+	
+	
 	/**
 	 * 查询设备关联的账户信息
 	 * 
@@ -266,6 +303,25 @@ public class DeviceController {
 		Iterable<AccountDevice> accountdevices = query.from(qAccountDevice).leftJoin(qAccountDevice.account, qAccount)
 				.fetch().leftJoin(qAccountDevice.device, qDevice).fetch().where(bDeviceno).list(qAccountDevice);
 
+		return accountdevices;
+	}
+	
+	
+	private Iterable<AccountDevice> getAccountDevice(String mobileno , String deviceno) {
+		QAccountDevice qAccountDevice = QAccountDevice.accountDevice;
+		QAccount qAccount = QAccount.account;
+		QDevice qDevice = QDevice.device;
+		
+		BooleanExpression accountMobile = qAccount.mobileno.eq(mobileno);
+		BooleanExpression deviceMobile = qDevice.no.eq(deviceno);
+
+		JPAQuery query = new JPAQuery(entityManager);
+		Iterable<AccountDevice> accountdevices = query.from(qAccountDevice)
+			 .leftJoin(qAccountDevice.account,qAccount).fetch()
+			 .leftJoin(qAccountDevice.device,qDevice).fetch()
+			 .where(accountMobile.and(deviceMobile))
+			 .list(qAccountDevice);
+	
 		return accountdevices;
 	}
 
