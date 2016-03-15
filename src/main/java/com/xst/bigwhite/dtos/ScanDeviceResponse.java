@@ -26,6 +26,11 @@ public class ScanDeviceResponse {
 	 * 管理员名称
 	 */
 	private String masternick;
+	
+	/**
+	 * 设备头像
+	 */
+	private String headimage;
 
 	/**
 	 * 是扫描二维码还是输入文字
@@ -60,12 +65,21 @@ public class ScanDeviceResponse {
 		this.scanType = scanType;
 	}
 	
+	public String getHeadimage() {
+		return headimage;
+	}
+	public void setHeadimage(String headimage) {
+		this.headimage = headimage;
+	}
+	
 	public static ScanDeviceResponse mapping(Device device) {
 		
 		ScanDeviceResponse response = new ScanDeviceResponse();
 		
 		response.setDevicename(device.getName());
 		response.setDeviceno(device.getNo());
+		response.setHeadimage(device.getHeadimage());
+		
 		Account master = device.getAccount();
 		if(master!=null){
 			response.setMasternick(master.getUsername());

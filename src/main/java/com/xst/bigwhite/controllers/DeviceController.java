@@ -2,6 +2,7 @@
 package com.xst.bigwhite.controllers;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,18 +20,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.xst.bigwhite.daos.AccountDeviceRepository;
 import com.xst.bigwhite.daos.AccountRepository;
+import com.xst.bigwhite.daos.DeviceBindRepository;
 import com.xst.bigwhite.daos.DeviceNoteRepository;
 import com.xst.bigwhite.daos.DeviceRepository;
 import com.xst.bigwhite.daos.VerifyMessageRepository;
 import com.xst.bigwhite.dtos.AccountDeviceInfo;
 import com.xst.bigwhite.dtos.AccountInfoRequest;
 import com.xst.bigwhite.dtos.AccountNoteSetRequest;
+import com.xst.bigwhite.dtos.BindDeviceInfoResponse;
 import com.xst.bigwhite.dtos.ConferenceAccountResponse;
 import com.xst.bigwhite.dtos.ConferenceDeviceRequest;
 import com.xst.bigwhite.dtos.DeviceAccountInfo;
 import com.xst.bigwhite.dtos.DeviceInfoRequest;
 import com.xst.bigwhite.dtos.DeviceInfoResponse;
 import com.xst.bigwhite.dtos.DeviceSetNoteInfoRequest;
+import com.xst.bigwhite.dtos.JoinDeviceInfoRequest;
 import com.xst.bigwhite.dtos.RegisterDeviceRequest;
 import com.xst.bigwhite.dtos.RegisterDeviceResponse;
 import com.xst.bigwhite.dtos.ScanDeviceRequest;
@@ -42,8 +46,11 @@ import com.xst.bigwhite.models.Account;
 import com.xst.bigwhite.models.AccountDevice;
 import com.xst.bigwhite.models.ConferenceAccount;
 import com.xst.bigwhite.models.Device;
+import com.xst.bigwhite.models.DeviceBind;
+import com.xst.bigwhite.models.DeviceBind.BindStatus;
 import com.xst.bigwhite.models.DeviceNote;
 import com.xst.bigwhite.service.AccountDeviceService;
+import com.xst.bigwhite.service.DeviceBindService;
 import com.xst.bigwhite.service.DeviceNoteService;
 import com.xst.bigwhite.utils.Helpers;
 
@@ -57,10 +64,11 @@ public class DeviceController {
 	private final VerifyMessageRepository verifyMessageRepository;
 	private final AccountDeviceRepository accountDeviceRepository;
 	private final DeviceNoteRepository deviceNoteRepository;
+	private final DeviceBindRepository deviceBindRepository;
 	
 	private final AccountDeviceService accountDeviceService;
 	private final DeviceNoteService deviceNoteService;
-	
+	private final DeviceBindService deviceBindService;
 
 	@Autowired
 	DeviceController(AccountRepository accountRepository, 
@@ -68,17 +76,21 @@ public class DeviceController {
 			VerifyMessageRepository verifyMessageRepository, 
 			AccountDeviceRepository accountDeviceRepository,
 			DeviceNoteRepository deviceNoteRepository,
+			DeviceBindRepository deviceBindRepository,
 			AccountDeviceService accountDeviceService,
-			DeviceNoteService deviceNoteService) {
+			DeviceNoteService deviceNoteService,
+			DeviceBindService deviceBindService) {
 		
 		this.deviceRepository = deviceRepository;
 		this.accountRepository = accountRepository;
 		this.verifyMessageRepository = verifyMessageRepository;
 		this.accountDeviceRepository = accountDeviceRepository;
 		this.deviceNoteRepository = deviceNoteRepository;
+		this.deviceBindRepository = deviceBindRepository;
 		
 		this.accountDeviceService = accountDeviceService;
 		this.deviceNoteService = deviceNoteService;
+		this.deviceBindService = deviceBindService;
 	}
 	
 	@PersistenceContext
@@ -237,7 +249,128 @@ public class DeviceController {
 		return true;
 	}
 	
+	/**
+	 * 更新大白管理元
+	 * 
+	 * @param AccountInfoRequest
+	 * @return Boolean
+	 */
+	@RequestMapping(value = "/bindDevice", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean bindDevice(@RequestBody final JoinDeviceInfoRequest input) {
+		if(StringUtils.isBlank(input.getDeviceno()) || StringUtils.isBlank(input.joindeviceno)){
+			throw new RestRuntimeException("设备号或者被绑定的设备号为空!");
+		}
+		
+		Iterable<DeviceBind> deviceBinds = deviceBindService.findDeviceBindByDeviceno(input.getDeviceno());
+		if(deviceBinds!=null && deviceBinds.iterator().hasNext()){
+			for(DeviceBind devicebind : deviceBinds){
+				//DeviceBind devicebind = deviceBinds.iterator().next();
+				if(devicebind.getBinded().no.equals(input.joindeviceno)){
+					if(devicebind.status == BindStatus.Unbind){
+						//
+					}else if(devicebind.status == BindStatus.Binded){
+						throw new RestRuntimeException("设备号" + input.getDeviceno() + "和设备号" + input.joindeviceno + "已经绑定!");
+					}else{
+						devicebind.status = BindStatus.Unbind;
+						devicebind.updateDate = new Date();
+						devicebind.setConfirmed(false);
+						deviceBindRepository.save(devicebind);
+					}
+				}
+			}
+		}else{
+			Optional<Device> deviced = deviceRepository.findTop1Byno(input.getDeviceno());
+			if(!deviced.isPresent()){
+				throw new RestRuntimeException("设备号" + input.getDeviceno() + "不存在!");
+			}
+			
+			Optional<Device> devicebinded = deviceRepository.findTop1Byno(input.joindeviceno);
+			if(!devicebinded.isPresent()){
+				throw new RestRuntimeException("绑定设备号" + input.joindeviceno + "不存在!");
+			}
+				
+			DeviceBind devicebind = new DeviceBind(deviced.get(),devicebinded.get());
+			devicebind.status = BindStatus.Unbind;
+			devicebind.setConfirmed(false);
+			deviceBindRepository.save(devicebind);
+		}
+			
+		return true;
+	}
 	
+	/**
+	 * 确认大白设备是否绑定通过
+	 * 
+	 * @param AccountInfoRequest
+	 * @return Boolean
+	 */
+	@RequestMapping(value = "/confirmBindDevice", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean confirmBindDevice(@RequestBody final JoinDeviceInfoRequest input) {
+		
+		Boolean isFind = false;
+		Iterable<DeviceBind> deviceBinds = deviceBindService.findDeviceBindByDeviceno(input.getDeviceno());
+		if(deviceBinds!=null && deviceBinds.iterator().hasNext()){
+			for(DeviceBind devicebind : deviceBinds){
+				//DeviceBind devicebind = deviceBinds.iterator().next();
+				if(devicebind.getBinded().no.equals(input.joindeviceno)){
+					//DeviceBind devicebind = deviceBinds.iterator().next();
+					devicebind.setConfirmed(input.confirmed);
+					devicebind.setStatus(input.confirmed ? BindStatus.Binded : BindStatus.Injected);
+					devicebind.updateDate = new Date();
+					
+					deviceBindRepository.save(devicebind);
+					isFind= true;
+					break;
+				}
+			}
+			
+			if(!isFind){
+				throw new RestRuntimeException("设备号" + input.getDeviceno() + "和设备号" + input.joindeviceno + "绑定申请不存在!");
+			}
+		}else{
+			throw new RestRuntimeException("设备号" + input.getDeviceno() + "和设备号" + input.joindeviceno + "绑定申请不存在!");
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * 查询设备关联的账户信息
+	 * 
+	 * @param ScanDeviceRequest
+	 * @return DeviceInfoResponse
+	 */
+	@RequestMapping(value = "/devices", method = RequestMethod.POST)
+	@ResponseBody
+	List<BindDeviceInfoResponse> bindedDevices(@RequestBody DeviceInfoRequest input) {
+		List<BindDeviceInfoResponse> response = new ArrayList<>();
+		
+		Iterable<DeviceBind> deviceBinds = deviceBindService.findDeviceBindByDeviceno(input.getDeviceno());
+		if(deviceBinds!=null && deviceBinds.iterator().hasNext()){
+			for(DeviceBind bind : deviceBinds){
+				BindDeviceInfoResponse item = mappingBindDeviceInfoResponse(bind);
+				response.add(item);
+			}
+		}
+		
+		return response;
+	}
+	
+	private BindDeviceInfoResponse mappingBindDeviceInfoResponse(DeviceBind bind) {
+		BindDeviceInfoResponse item =new BindDeviceInfoResponse();
+		
+		item.setConfirmed(bind.getConfirmed());
+		item.setStatus(bind.getStatus());
+		item.setDeviceno(bind.getBinded().no);
+		item.setDevicename(bind.getBinded().name);
+		item.setHeadimage(bind.getBinded().headimage);
+		
+		return item;
+	}
+
+
 	/**
 	 * 查询设备关联的账户信息
 	 * 
