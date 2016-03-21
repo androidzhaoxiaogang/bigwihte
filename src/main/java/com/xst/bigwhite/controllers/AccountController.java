@@ -542,6 +542,7 @@ public class AccountController {
 		   accountDevice.setConfirmed(false);
 		   if(device.getDevices() ==null || device.getDevices().isEmpty()){
 			   accountDevice.setDevicemaster(true);
+			   accountDevice.setConfirmed(true);
 		   }
 		   
 		   accountDeviceRepository.save(accountDevice);
@@ -690,6 +691,37 @@ public class AccountController {
 
 		return accountDeviceInfoes;
 	}
+	
+	/**
+	 * 查询是否审核通过设备(申请的绑定到指定的设备列表 )
+	 * 
+	 * @param ConfirmAccountRequest
+	 * @return ArrayList<AccountDeviceInfo>
+	 */
+	@RequestMapping(value = "/devices", method = RequestMethod.POST)
+	@ResponseBody
+	List<AccountDeviceInfo> accountDevices(@RequestBody AccountInfoRequest input) {
+		List<AccountDeviceInfo> response = new ArrayList<AccountDeviceInfo>();
+		
+		Optional<Account> accounted = accountRepository.findTop1ByMobileno(input.mobileno);
+		if(accounted.isPresent()){
+			Iterable<AccountDevice> deviceInfoes = accountDeviceService.getAccountDeviceByAccountMobile(input.mobileno);
+			if(deviceInfoes!=null && deviceInfoes.iterator().hasNext()){
+				for (AccountDevice accountDeviceInfo : deviceInfoes) {
+
+					AccountDeviceInfo item = AccountDeviceInfo.mapping(accountDeviceInfo);
+					response.add(item);
+
+				}
+			}
+		}else{
+			throw new RestRuntimeException("用户:" + input.mobileno + "不存在!");
+		}
+		
+		return response;
+	}
+	
+	
 	
 	 /* 查询当前账户下所有的会议信息
 	 * 
