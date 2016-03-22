@@ -747,7 +747,8 @@ public class AccountController {
 				
 				if(accountNotes!=null && accountNotes.iterator().hasNext()){
 					for(AccountNote accountNote : accountNotes){
-						if(accountNote.getAccount().getId().equals(accountDevice.getAccount().getId())){
+						if(accountNote.getContact().getId().equals(accountDevice.getAccount().getId())
+								&& accountNote.getDevice().getId().equals(accountNote.getDevice().getId())){
 							if(StringUtils.isNotBlank(accountNote.noteName)){
 								accountContractResponse.setNoteName(accountNote.noteName);
 							}
