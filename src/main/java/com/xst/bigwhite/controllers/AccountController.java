@@ -733,20 +733,27 @@ public class AccountController {
 	List<AccoutContractResponse> contactAccounts(@RequestBody AccountInfoRequest input) {
 		List<AccoutContractResponse>  response = new ArrayList<AccoutContractResponse>();
 		
+		Iterable<AccountDevice> accountDevices = accountDeviceService.getAccountDeviceByDeviceno(input.deviceno);
 		Iterable<AccountNote> accountNotes = accountNoteService.getAccountNotesByAccountMobileAndDevice(input.mobileno,input.deviceno);
-		if (accountNotes!=null && accountNotes.iterator().hasNext()) {
-			for(AccountNote accountNote :  accountNotes){
+		
+		if (accountDevices!=null && accountDevices.iterator().hasNext()) {
+			for(AccountDevice accountDevice :  accountDevices){
 				AccoutContractResponse accountContractResponse = new AccoutContractResponse();
 				
-				accountContractResponse.setHeadimage(accountNote.getAccount().headimage);
-				accountContractResponse.setMobileno(accountNote.getAccount().mobileno);
-				accountContractResponse.setUsername(accountNote.getAccount().username);
-				accountContractResponse.setNoteName(accountNote.getAccount().username);
+				accountContractResponse.setHeadimage(accountDevice.getAccount().headimage);
+				accountContractResponse.setMobileno(accountDevice.getAccount().mobileno);
+				accountContractResponse.setUsername(accountDevice.getAccount().username);
+				accountContractResponse.setNoteName(accountDevice.getAccount().username);
 				
-				if(StringUtils.isNotBlank(accountNote.noteName)){
-					accountContractResponse.setNoteName(accountNote.noteName);
+				if(accountNotes!=null && accountNotes.iterator().hasNext()){
+					for(AccountNote accountNote : accountNotes){
+						if(accountNote.getAccount().getId().equals(accountDevice.getAccount().getId())){
+							if(StringUtils.isNotBlank(accountNote.noteName)){
+								accountContractResponse.setNoteName(accountNote.noteName);
+							}
+						}
+					}
 				}
-				
 				response.add(accountContractResponse);
 			}
 		}

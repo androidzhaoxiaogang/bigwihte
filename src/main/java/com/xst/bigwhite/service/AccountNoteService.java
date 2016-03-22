@@ -48,7 +48,7 @@ public class AccountNoteService {
 		QAccount qAccount2 = QAccount.account;
 		QDevice qDevice = QDevice.device;
 		
-		BooleanExpression bAccount = qAccount.mobileno.notEqualsIgnoreCase(mobileno);
+		//BooleanExpression bAccount = qAccount.mobileno.(mobileno);
 		BooleanExpression bDevice = qDevice.no.eq(deviceno);
 		// Iterable<AccountDevice> accountList =
 		// accountDeviceRepository.findAll(bDeviceno);
@@ -58,7 +58,7 @@ public class AccountNoteService {
 				                                     .rightJoin(qAccountNote.account,qAccount).fetch()
 				                                     .leftJoin(qAccountNote.device,qDevice).fetch()
 				                                     //.leftJoin(qAccountNote.contact,qAccount2).fetch()
-				                                     .where(bDevice.and(bAccount))
+				                                     .where(bDevice)
 				                                     .list(qAccountNote);
 
 		return accountNotes;
