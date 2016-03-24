@@ -62,7 +62,11 @@ public class AccountDeviceInfo {
 	 */
 	public Boolean confirmed = new Boolean(false);
 	
-
+	/**
+	 * 是否启用IPC
+	 */
+	public Boolean ipc = new Boolean(false);
+	
 	public String getMobileno() {
 		return mobileno;
 	}
@@ -146,6 +150,14 @@ public class AccountDeviceInfo {
 		this.confirmed = confirmed;
 	}
 
+	public Boolean getIpc() {
+		return ipc;
+	}
+
+	public void setIpc(Boolean ipc) {
+		this.ipc = ipc;
+	}
+
 	public static AccountDeviceInfo mapping(AccountDevice acdevice) {
 
 		AccountDeviceInfo deviceInfo = new AccountDeviceInfo();
@@ -158,6 +170,7 @@ public class AccountDeviceInfo {
 		deviceInfo.setHeadimage(acdevice.getAccount().headimage);
 		deviceInfo.setMobileno(acdevice.getAccount().getMobileno());
 		deviceInfo.setNick(acdevice.getNick());
+		deviceInfo.setIpc(acdevice.getIpc());
 
 		deviceInfo.setDevicemaster(acdevice.getDevicemaster());
 		deviceInfo.setConfirmed(acdevice.getConfirmed());

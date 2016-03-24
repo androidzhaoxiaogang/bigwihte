@@ -28,7 +28,10 @@ public class AccoutContractResponse{
      */
 	public String noteName;
 
-
+	/**
+	 * 是否启用了IPC
+	 */
+    public Boolean ipc = new Boolean(false);
 	
 	public String getMobileno() {
 		return mobileno;
@@ -62,5 +65,14 @@ public class AccoutContractResponse{
 	public void setNoteName(String noteName) {
 		this.noteName = noteName;
 	}
+
+	public Boolean getIpc() {
+		return ipc;
+	}
+
+	public void setIpc(Boolean ipc) {
+		this.ipc = ipc;
+	}
+
 	
 }

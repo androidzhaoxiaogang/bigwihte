@@ -70,6 +70,12 @@ public class AccountDevice implements Serializable {
 	 * 是否验证通过
 	 */
 	public Boolean confirmed = new Boolean(false);
+	
+	/**
+	 * 是否设置IPC
+	 */
+	public Boolean ipc = new  Boolean(false);
+	
 
 	/**
 	 * 加入日期
@@ -161,6 +167,14 @@ public class AccountDevice implements Serializable {
 
 	public void setConfirmeddate(Date confirmeddate) {
 		this.confirmeddate = confirmeddate;
+	}
+
+	public Boolean getIpc() {
+		return ipc;
+	}
+
+	public void setIpc(Boolean ipc) {
+		this.ipc = ipc;
 	}
 
 	

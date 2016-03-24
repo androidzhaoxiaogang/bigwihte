@@ -30,7 +30,6 @@ public class AccountInfoResponse {
 	 */
     public String headimage;
     
-    
 	/**
 	 * 当前账户下面所有设备信息
 	 */

@@ -199,7 +199,7 @@ public class AccountController {
 	/**
 	 * 修改账户的昵称
 	 * @param AccountInfoRequest
-	 * @return AccountInfoResponse
+	 * @return Boolean
 	 */
 	@RequestMapping(value = "/updateDeviceNick", method = RequestMethod.POST)
 	@ResponseBody
@@ -220,6 +220,29 @@ public class AccountController {
 	    return true;
 	}
 	
+	/**
+	 * 启用账户的IPC
+	 * @param AccountInfoRequest
+	 * @return Boolean
+	 */
+	@RequestMapping(value = "/enableIPC", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean enableIPC(@RequestBody ConfirmAccountRequest input) {
+	    if(input.getMobileno() != null && input.getDeviceno()!= null){
+	    	Iterable<AccountDevice> devices = accountDeviceService.getAccountDevice(input.mobileno,input.deviceno);
+	    	if(devices!=null && devices.iterator().hasNext()){
+	    		AccountDevice device = devices.iterator().next();
+	    		device.setIpc(input.yesno);
+				accountDeviceRepository.save(device);
+	    	}else{
+	    		throw new RestRuntimeException("没有查到账户" + input.mobileno + "设备号" + input.deviceno + "已经绑定的信息！");
+	    	}
+	    }else{
+	    	throw new RestRuntimeException("用户名或者设备号和设备昵称不能为空！");
+	    }
+		
+	    return true;
+	}
 	
 	@Value("${justalk.prikey}")
 	String fileName;
@@ -460,8 +483,8 @@ public class AccountController {
 					accountDevice.setAccount(account);
 					accountDevice.setCreatedate(new Date());
 					accountDevice.setNick(input.getUsername());
-					
-	
+					accountDevice.setConfirmed(false);
+					accountDevice.setIpc(false);
 					Device device = deviced.get();
 					if (device.getAccount() == null) {
 	
@@ -540,6 +563,8 @@ public class AccountController {
 		   accountDevice.setNick(account.getUsername());
 		   accountDevice.setDeviceNick(device.name);
 		   accountDevice.setConfirmed(false);
+		   accountDevice.setIpc(false);
+		   
 		   if(device.getDevices() ==null || device.getDevices().isEmpty()){
 			   accountDevice.setDevicemaster(true);
 			   accountDevice.setConfirmed(true);
@@ -744,6 +769,7 @@ public class AccountController {
 				accountContractResponse.setMobileno(accountDevice.getAccount().mobileno);
 				accountContractResponse.setUsername(accountDevice.getAccount().username);
 				accountContractResponse.setNoteName(accountDevice.getAccount().username);
+				accountContractResponse.setIpc(accountDevice.getIpc());
 				
 				if(accountNotes!=null && accountNotes.iterator().hasNext()){
 					for(AccountNote accountNote : accountNotes){
