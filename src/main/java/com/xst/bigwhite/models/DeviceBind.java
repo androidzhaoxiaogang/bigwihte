@@ -80,6 +80,12 @@ public class DeviceBind implements Serializable {
 	public String note;
 	
 	/**
+	 * 设备是否启用IPC
+	 */
+	public Boolean ipc =new Boolean(false);
+	
+	
+	/**
 	 * 绑定状态
 	 */
 	@Enumerated(EnumType.STRING)
@@ -162,6 +168,16 @@ public class DeviceBind implements Serializable {
 
 	public void setConfirmed(Boolean confirmed) {
 		this.confirmed = confirmed;
+	}
+
+
+	public Boolean getIpc() {
+		return ipc;
+	}
+
+
+	public void setIpc(Boolean ipc) {
+		this.ipc = ipc;
 	}
 
 

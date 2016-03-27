@@ -238,7 +238,7 @@ public class AccountController {
 	    		throw new RestRuntimeException("没有查到账户" + input.mobileno + "设备号" + input.deviceno + "已经绑定的信息！");
 	    	}
 	    }else{
-	    	throw new RestRuntimeException("用户名或者设备号和设备昵称不能为空！");
+	    	throw new RestRuntimeException("用户名或者设备号和 不能为空！");
 	    }
 		
 	    return true;

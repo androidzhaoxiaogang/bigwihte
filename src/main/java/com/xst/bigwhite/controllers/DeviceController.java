@@ -30,10 +30,12 @@ import com.xst.bigwhite.dtos.AccountNoteSetRequest;
 import com.xst.bigwhite.dtos.BindDeviceInfoResponse;
 import com.xst.bigwhite.dtos.ConferenceAccountResponse;
 import com.xst.bigwhite.dtos.ConferenceDeviceRequest;
+import com.xst.bigwhite.dtos.ConfirmAccountRequest;
 import com.xst.bigwhite.dtos.DeviceAccountInfo;
 import com.xst.bigwhite.dtos.DeviceInfoRequest;
 import com.xst.bigwhite.dtos.DeviceInfoResponse;
 import com.xst.bigwhite.dtos.DeviceSetNoteInfoRequest;
+import com.xst.bigwhite.dtos.IpcDeviceInfoRequest;
 import com.xst.bigwhite.dtos.JoinDeviceInfoRequest;
 import com.xst.bigwhite.dtos.RegisterDeviceRequest;
 import com.xst.bigwhite.dtos.RegisterDeviceResponse;
@@ -359,17 +361,39 @@ public class DeviceController {
 	}
 	
 	private BindDeviceInfoResponse mappingBindDeviceInfoResponse(DeviceBind bind) {
-		BindDeviceInfoResponse item =new BindDeviceInfoResponse();
+		BindDeviceInfoResponse item = new BindDeviceInfoResponse();
 		
 		item.setConfirmed(bind.getConfirmed());
 		item.setStatus(bind.getStatus());
 		item.setDeviceno(bind.getBinded().no);
 		item.setDevicename(bind.getBinded().name);
 		item.setHeadimage(bind.getBinded().headimage);
+		item.setIpc(bind.getIpc());
 		
 		return item;
 	}
 
+	/**
+	 * 启用账户的IPC
+	 * @param AccountInfoRequest
+	 * @return Boolean
+	 */
+	@RequestMapping(value = "/enableIPC", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean enableIPC(@RequestBody IpcDeviceInfoRequest input) {
+	
+		Iterable<DeviceBind> deviceBinds = deviceBindService.findDeviceBindByDevice(input.getDeviceno(),input.bind_deviceno);
+		if(deviceBinds!=null && deviceBinds.iterator().hasNext()){
+			DeviceBind deviceBind = deviceBinds.iterator().next();
+			deviceBind.setIpc(input.getYesno());
+			
+			deviceBindRepository.save(deviceBind);
+		}else{
+		  throw new RestRuntimeException("设备号:" + input.getDeviceno() + "和设备号:" + input.bind_deviceno +"还没有绑定!"); 	
+		}
+		
+		return false;
+	}
 
 	/**
 	 * 查询设备关联的账户信息

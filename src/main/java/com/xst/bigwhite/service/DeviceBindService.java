@@ -26,7 +26,6 @@ public class DeviceBindService {
 		//QDevice qDevice2 = QDevice.device;
 		
 		BooleanExpression bDevice =  qDevice.no.eq(deviceno);
-		BooleanExpression bDevice2 = qDevice.no.eq(joindeviceno);
 		// Iterable<AccountDevice> accountList =
 		// accountDeviceRepository.findAll(bDeviceno);
 		JPAQuery query = new JPAQuery(entityManager);
@@ -35,7 +34,7 @@ public class DeviceBindService {
 				                                     .leftJoin(qDeviceBind.device,qDevice).fetch()
 				                                      //.leftJoin(qDeviceBind.binded,qDevice2).fetch()
 				                                     //.leftJoin(qAccountNote.contact,qAccount2).fetch()
-				                                     .where(bDevice.and(bDevice2))
+				                                     .where(qDeviceBind.device.no.eq(deviceno).and(qDeviceBind.binded.no.eq(joindeviceno)))
 				                                     .list(qDeviceBind);
 
 		return deviceBinds;
@@ -63,5 +62,6 @@ public class DeviceBindService {
 
 		return deviceBinds;
 	}
+
 
 }

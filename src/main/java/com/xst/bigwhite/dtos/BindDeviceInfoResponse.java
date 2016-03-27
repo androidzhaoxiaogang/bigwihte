@@ -26,6 +26,11 @@ public class BindDeviceInfoResponse {
 	private Boolean confirmed;
 	
 	/**
+	 * 是否启用IPC
+	 */
+	public Boolean ipc = new Boolean(false);
+	
+	/**
 	 * 绑定状态
 	 */
 	private BindStatus status = BindStatus.Unbind;
@@ -68,6 +73,14 @@ public class BindDeviceInfoResponse {
 
 	public void setStatus(BindStatus status) {
 		this.status = status;
+	}
+
+	public Boolean getIpc() {
+		return ipc;
+	}
+
+	public void setIpc(Boolean ipc) {
+		this.ipc = ipc;
 	}
 
 	

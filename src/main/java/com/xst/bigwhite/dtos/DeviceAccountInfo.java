@@ -48,6 +48,12 @@ public class DeviceAccountInfo {
      * 是否是设备管理员
      */
 	public Boolean devicemaster = new Boolean(false);
+	
+	/**
+	 * 是否启用IPC
+	 */
+	public Boolean ipc = new Boolean(false);
+	
 
 	public String getMobileno() {
 		return mobileno;
@@ -106,7 +112,14 @@ public class DeviceAccountInfo {
 		this.devicemaster = devicemaster;
 	}
 
-	
+	public Boolean getIpc() {
+		return ipc;
+	}
+
+	public void setIpc(Boolean ipc) {
+		this.ipc = ipc;
+	}
+
 	public String getDeviceNo() {
 		return deviceNo;
 	}
@@ -123,6 +136,8 @@ public class DeviceAccountInfo {
     	accountInfo.setMobileno(ac.getAccount().mobileno);
     	accountInfo.setNick(ac.nick);
     	accountInfo.setDeviceNo(ac.getDevice().no);
+    	
+    	accountInfo.setIpc(ac.getIpc());
     	
     	accountInfo.setDeviceNick(ac.getDeviceNick());
     	accountInfo.setUsername(ac.getAccount().getUsername());
