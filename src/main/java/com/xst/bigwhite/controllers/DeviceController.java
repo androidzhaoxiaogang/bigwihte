@@ -392,7 +392,7 @@ public class DeviceController {
 		  throw new RestRuntimeException("设备号:" + input.getDeviceno() + "和设备号:" + input.bind_deviceno +"还没有绑定!"); 	
 		}
 		
-		return false;
+		return true;
 	}
 
 	/**
