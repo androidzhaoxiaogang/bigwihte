@@ -396,6 +396,23 @@ public class DeviceController {
 	}
 
 	/**
+	 * 启用账户的IPC
+	 * @param AccountInfoRequest
+	 * @return Boolean
+	 */
+	@RequestMapping(value = "/checkIPC", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean checkIPC(@RequestBody IpcDeviceInfoRequest input) {
+		Iterable<DeviceBind> deviceBinds = deviceBindService.findDeviceBindByDevice(input.getDeviceno(),input.bind_deviceno);
+		if(deviceBinds!=null && deviceBinds.iterator().hasNext()){
+			DeviceBind deviceBind = deviceBinds.iterator().next();
+			return deviceBind.ipc;
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * 查询设备关联的账户信息
 	 * 
 	 * @param ScanDeviceRequest

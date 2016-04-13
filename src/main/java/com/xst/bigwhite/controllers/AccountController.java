@@ -244,6 +244,26 @@ public class AccountController {
 	    return true;
 	}
 	
+	/**
+	 * 启用账户的IPC
+	 * @param AccountInfoRequest
+	 * @return Boolean
+	 */
+	@RequestMapping(value = "/checkIPC", method = RequestMethod.POST)
+	@ResponseBody
+	Boolean checkIPC(@RequestBody ConfirmAccountRequest input) {
+		
+		if(input.getMobileno() != null && input.getDeviceno()!= null){
+	    	Iterable<AccountDevice> devices = accountDeviceService.getAccountDevice(input.mobileno,input.deviceno);
+	    	if(devices!=null && devices.iterator().hasNext()){
+	    		AccountDevice device = devices.iterator().next();
+	    		return device.ipc;
+	    	}
+		}
+		
+		return false;
+	}
+	
 	@Value("${justalk.prikey}")
 	String fileName;
 	
